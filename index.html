@@ -1,6 +1,6 @@
 <title>Knowify Pulse</title>
 <style>
-  .viz-root {
+  :root, .viz-root {
     color-scheme: light;
     --surface-1:      #fcfcfb;
     --surface-2:      #f9f9f7;
@@ -26,7 +26,7 @@
     --shadow: 0 12px 28px rgba(11,11,11,0.12);
   }
   @media (prefers-color-scheme: dark) {
-    :root:where(:not([data-theme="light"])) .viz-root {
+    :root:where(:not([data-theme="light"])), :root:where(:not([data-theme="light"])) .viz-root {
       color-scheme: dark;
       --surface-1:      #1a1a19;
       --surface-2:      #0d0d0d;
@@ -52,7 +52,7 @@
       --shadow: 0 12px 28px rgba(0,0,0,0.5);
     }
   }
-  :root[data-theme="dark"] .viz-root {
+  :root[data-theme="dark"], :root[data-theme="dark"] .viz-root {
     color-scheme: dark;
     --surface-1:      #1a1a19;
     --surface-2:      #0d0d0d;
