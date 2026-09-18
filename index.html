@@ -212,7 +212,6 @@
   .cal-day.today .num { color: var(--accent); }
   .cal-day .evt { font-size: 10.5px; line-height: 1.35; background: var(--accent-wash); color: var(--accent); border-radius: 5px; padding: 3px 5px; cursor: pointer; overflow: hidden; overflow-wrap: anywhere; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
   .cal-day .evt:hover { filter: brightness(0.95); }
-  .cal-note { font-size: 12px; color: var(--text-muted); margin-top: 14px; line-height: 1.6; }
   @media (max-width: 700px) { .cal-day { min-height: 60px; padding: 6px; } .cal-day .evt { font-size: 9.5px; -webkit-line-clamp: 1; } .cal-weekdays span { font-size: 9.5px; } }
 </style>
 
@@ -269,7 +268,6 @@
       <p style="font-size:13px;color:var(--text-secondary);margin:0 0 14px;" id="cal-range-label"></p>
       <div class="cal-weekdays"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
       <div class="cal-grid" id="cal-grid"></div>
-      <p class="cal-note" id="cal-note"></p>
     </section>
 
     <footer class="note">
@@ -540,10 +538,6 @@
     document.querySelectorAll('.cal-day .evt').forEach(function(el){
       el.addEventListener('click', function(){ openDrawer(parseInt(el.dataset.id,10)); });
     });
-
-    var noteCount = calendarEvents.length;
-    document.getElementById('cal-note').textContent =
-      noteCount + ' phase' + (noteCount===1?'':'s') + ' currently ha' + (noteCount===1?'s':'ve') + ' a real scheduled date in Knowify. Everything else here runs on status and comments rather than a dated schedule — that\'s worth changing if you want this calendar to fill in.';
   }
   renderCalendar();
 
