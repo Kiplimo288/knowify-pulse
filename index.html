@@ -1,0 +1,512 @@
+<title>Knowify Pulse</title>
+<style>
+  .viz-root {
+    color-scheme: light;
+    --surface-1:      #fcfcfb;
+    --surface-2:      #f9f9f7;
+    --surface-3:      #f1f0ec;
+    --surface-4:      #ffffff;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --accent:         #2a78d6;
+    --accent-wash:    #e8f0fb;
+    --good:           #0ca30c;
+    --good-wash:      #e5f6e5;
+    --warning:        #b3790f;
+    --warning-wash:   #fdf1d9;
+    --serious:        #c85a34;
+    --serious-wash:   #fbe7dd;
+    --critical:       #d03b3b;
+    --critical-wash:  #fbe2e2;
+    --neutral-wash:   #eeede8;
+    --shadow: 0 12px 28px rgba(11,11,11,0.12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-1:      #1a1a19;
+      --surface-2:      #0d0d0d;
+      --surface-3:      #232322;
+      --surface-4:      #26261f;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --accent:         #3987e5;
+      --accent-wash:    #17222f;
+      --good:           #0ca30c;
+      --good-wash:      #12291a;
+      --warning:        #fab219;
+      --warning-wash:   #2e2312;
+      --serious:        #ec835a;
+      --serious-wash:   #2e1f16;
+      --critical:       #e66767;
+      --critical-wash:  #301818;
+      --neutral-wash:   #26261f;
+      --shadow: 0 12px 28px rgba(0,0,0,0.5);
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface-1:      #1a1a19;
+    --surface-2:      #0d0d0d;
+    --surface-3:      #232322;
+    --surface-4:      #26261f;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --gridline:       #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --accent:         #3987e5;
+    --accent-wash:    #17222f;
+    --good:           #0ca30c;
+    --good-wash:      #12291a;
+    --warning:        #fab219;
+    --warning-wash:   #2e2312;
+    --serious:        #ec835a;
+    --serious-wash:   #2e1f16;
+    --critical:       #e66767;
+    --critical-wash:  #301818;
+    --neutral-wash:   #26261f;
+    --shadow: 0 12px 28px rgba(0,0,0,0.5);
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--surface-2); }
+  .viz-root {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--surface-2);
+    color: var(--text-primary);
+    padding: 20px 16px 48px;
+    min-height: 100%;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+
+  header.top { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+  .title-block h1 { font-size: 22px; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
+  .title-block .company { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+  .asof { font-size: 12px; color: var(--text-muted); text-align: right; }
+  .asof strong { color: var(--text-secondary); font-weight: 600; }
+
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 18px 0 20px; }
+  .kpi { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 13px 15px; display: flex; flex-direction: column; gap: 4px; }
+  .kpi .label { font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .kpi .value { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .kpi .value.warn { color: var(--warning); }
+  .kpi .sub { font-size: 11.5px; color: var(--text-muted); }
+  @media (max-width: 640px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+
+  .tabs { display: flex; gap: 4px; margin-bottom: 14px; border-bottom: 1px solid var(--gridline); flex-wrap: wrap; }
+  .tab { appearance: none; border: none; background: none; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--text-muted); padding: 8px 4px 10px; border-bottom: 2px solid transparent; margin-right: 16px; }
+  .tab[aria-selected="true"] { color: var(--text-primary); border-bottom-color: var(--accent); }
+  .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--text-secondary); margin-bottom: 14px; }
+  .legend .item { display: inline-flex; align-items: center; gap: 6px; }
+  .legend .swatch { width: 9px; height: 9px; border-radius: 3px; display: inline-block; }
+
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+  .pill.good { background: var(--good-wash); color: var(--good); }
+  .pill.warning { background: var(--warning-wash); color: var(--warning); }
+  .pill.serious { background: var(--serious-wash); color: var(--serious); }
+  .pill.critical { background: var(--critical-wash); color: var(--critical); }
+  .pill.neutral { background: var(--neutral-wash); color: var(--text-secondary); }
+
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; align-items: center; }
+  .search { flex: 1; min-width: 180px; }
+  .search input { width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary); font-size: 13px; }
+  .filter-chip { appearance: none; border: 1px solid var(--border); background: var(--surface-1); color: var(--text-secondary); font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 999px; cursor: pointer; }
+  .filter-chip[aria-pressed="true"] { background: var(--accent-wash); color: var(--accent); border-color: var(--accent); }
+
+  /* Pulse cards */
+  .pulse-list { display: flex; flex-direction: column; gap: 10px; }
+  .pulse-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; cursor: pointer; transition: box-shadow .15s ease; }
+  .pulse-card:hover { box-shadow: var(--shadow); }
+  .pulse-card .row1 { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+  .pulse-card .proj { font-size: 14.5px; font-weight: 700; }
+  .pulse-card .client { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+  .pulse-card .meta { font-size: 11.5px; color: var(--text-muted); text-align: right; white-space: nowrap; }
+  .pulse-card .summary { font-size: 13px; color: var(--text-secondary); margin-top: 9px; line-height: 1.5; }
+  .pulse-card .flag { display: flex; gap: 6px; align-items: flex-start; font-size: 12.5px; color: var(--warning); margin-top: 8px; font-weight: 600; }
+  .pulse-card .flag .ico { flex: 0 0 auto; }
+  .pulse-card .progress-track { height: 5px; border-radius: 3px; background: var(--gridline); margin-top: 10px; overflow: hidden; }
+  .pulse-card .progress-fill { height: 100%; background: var(--accent); border-radius: 3px; }
+
+  /* Full table */
+  table.full-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.full-table th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--gridline); position: sticky; top: 0; background: var(--surface-2); }
+  table.full-table td { padding: 9px 10px; border-bottom: 1px solid var(--gridline); vertical-align: middle; }
+  table.full-table tr.rowbtn { cursor: pointer; }
+  table.full-table tr.rowbtn:hover td { background: var(--surface-3); }
+  table.full-table td.name { font-weight: 600; }
+  table.full-table td.pct { font-variant-numeric: tabular-nums; color: var(--text-secondary); white-space: nowrap; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-1); }
+  .table-wrap table.full-table th:first-child, .table-wrap table.full-table td:first-child { padding-left: 14px; }
+
+  .mini-bar { display: inline-block; width: 54px; height: 5px; border-radius: 3px; background: var(--gridline); overflow: hidden; vertical-align: middle; margin-right: 6px; }
+  .mini-bar > span { display: block; height: 100%; background: var(--accent); }
+
+  /* Drill-down overlay */
+  .overlay { position: fixed; inset: 0; background: rgba(11,11,11,0.35); display: none; z-index: 30; }
+  .overlay.open { display: block; }
+  .drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; width: min(480px, 100vw);
+    background: var(--surface-1); z-index: 31; box-shadow: var(--shadow);
+    transform: translateX(100%); transition: transform .2s ease;
+    overflow-y: auto; padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+  }
+  .drawer.open { transform: translateX(0); }
+  .drawer-close { appearance: none; border: none; background: var(--surface-3); color: var(--text-secondary); width: 30px; height: 30px; border-radius: 50%; font-size: 16px; cursor: pointer; float: right; }
+  .drawer h2 { font-size: 18px; margin: 0 26px 2px 0; }
+  .drawer .client { font-size: 13px; color: var(--text-muted); margin-bottom: 14px; }
+  .drawer .kv { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .drawer .kv-item { background: var(--surface-3); border-radius: 8px; padding: 8px 10px; }
+  .drawer .kv-item .k { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); }
+  .drawer .kv-item .v { font-size: 13px; font-weight: 600; margin-top: 2px; }
+  .drawer h3 { font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); margin: 18px 0 8px; }
+  .drawer .narrative { font-size: 13.5px; line-height: 1.6; color: var(--text-secondary); background: var(--surface-3); border-radius: 10px; padding: 12px 14px; }
+  .drawer .narrative .flag { color: var(--warning); font-weight: 600; margin-top: 8px; display: block; }
+  .phase-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--gridline); font-size: 13px; }
+  .phase-row:last-child { border-bottom: none; }
+  .phase-row .state { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; }
+  .phase-row .state.active { background: var(--good-wash); color: var(--good); }
+  .phase-row .state.pending { background: var(--neutral-wash); color: var(--text-secondary); }
+  .phase-row .state.closed { background: var(--accent-wash); color: var(--accent); }
+  .no-detail { font-size: 13px; color: var(--text-muted); font-style: italic; }
+
+  footer.note { margin-top: 28px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--gridline); padding-top: 14px; line-height: 1.6; }
+</style>
+
+<div class="viz-root">
+  <div class="wrap">
+    <header class="top">
+      <div class="title-block">
+        <h1>Knowify Pulse</h1>
+        <div class="company">Safe Gas Systems — job status, pulled live from Knowify</div>
+      </div>
+      <div class="asof" id="asof"></div>
+    </header>
+
+    <div class="kpis" id="kpis"></div>
+
+    <div role="tablist" class="tabs" aria-label="Dashboard view">
+      <button class="tab" id="tab-pulse" role="tab" aria-selected="true" aria-controls="panel-pulse">Short-Term Pulse</button>
+      <button class="tab" id="tab-all" role="tab" aria-selected="false" aria-controls="panel-all">All Projects</button>
+    </div>
+
+    <section class="panel active" id="panel-pulse" role="tabpanel" aria-labelledby="tab-pulse">
+      <p style="font-size:13px;color:var(--text-secondary);margin:0 0 14px;">Jobs with activity in the last 14 days, most recent first. Summaries are generated from field notes and comments logged in Knowify.</p>
+      <div class="legend">
+        <span class="item"><span class="swatch" style="background:var(--good)"></span> Progressing normally</span>
+        <span class="item"><span class="swatch" style="background:var(--warning)"></span> Flagged / needs a decision</span>
+        <span class="item"><span class="swatch" style="background:var(--text-muted)"></span> Awaiting client</span>
+      </div>
+      <div class="pulse-list" id="pulse-list"></div>
+    </section>
+
+    <section class="panel" id="panel-all" role="tabpanel" aria-labelledby="tab-all">
+      <div class="toolbar">
+        <div class="search"><input type="search" id="search-input" placeholder="Search by project or client…" /></div>
+        <button class="filter-chip" data-filter="all" aria-pressed="true">All</button>
+        <button class="filter-chip" data-filter="execution" aria-pressed="false">In Execution</button>
+        <button class="filter-chip" data-filter="pipeline" aria-pressed="false">Pipeline / Bidding</button>
+      </div>
+      <div class="table-wrap">
+        <table class="full-table">
+          <thead><tr><th>Project</th><th>Client</th><th>Status</th><th>% Complete</th><th>PM</th></tr></thead>
+          <tbody id="full-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="note">
+      Scope: open jobs classified as design/build contract work (excludes one-off field-service tickets and maintenance-visit agreements, per Knowify's own job classification). Pulled directly from Knowify via its AI connector — this is a snapshot, not a live feed; ask for a refresh any time, or set it on a schedule.
+    </footer>
+  </div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+<div class="drawer" id="drawer">
+  <button class="drawer-close" id="drawer-close" aria-label="Close">&times;</button>
+  <div id="drawer-content"></div>
+</div>
+
+<script>
+(function () {
+  var asOf = new Date('2026-09-18T00:00:00Z');
+  document.getElementById('asof').innerHTML = 'Data as of<br><strong>Sep 18, 2026</strong>';
+
+  // ---------------------------------------------------------------------
+  // Real project data pulled from Knowify (JobsReport + Projects), scoped
+  // to open "contract jobs" (ServiceTicketId null, ContractType != Maintenance).
+  // ---------------------------------------------------------------------
+  var STAGE = {
+    '#ACTIVE': 'execution', '#PENDING_CHANGES': 'execution',
+    '#LEAD': 'pipeline', '#BIDDING': 'pipeline', '#OUT_FOR_SIGNATURE': 'pipeline', '#PROPOSAL_EXPIRED': 'pipeline'
+  };
+  var STATUS_LABEL = {
+    '#ACTIVE': 'Active', '#PENDING_CHANGES': 'Pending Change Order', '#LEAD': 'Lead',
+    '#BIDDING': 'Bidding', '#OUT_FOR_SIGNATURE': 'Out for Signature', '#PROPOSAL_EXPIRED': 'Proposal Expired'
+  };
+
+  var projects = [
+    {id:1842316,name:"Rebuild/Repair Final Line Assemblies",client:"Rocky Mountain Air",status:"#ACTIVE",pct:null,pm:""},
+    {id:1850592,name:"Nitrogen Manifold with Support and Dewar Restraints",client:"Shawn Wagner",status:"#PROPOSAL_EXPIRED",pct:0},
+    {id:1850607,name:"RMA Dewars Repair",client:"Rocky Mountain Air",status:"#ACTIVE",pct:65.34,
+      recent:true, phasesRollup:"32 dewars in the repair batch — 24 in progress, 6 not yet started, 1 subcontracted step closed.",
+      summary:"Working through a large batch of cryogenic dewars needing repair, unit by unit. Most units are actively in progress; a handful haven't been started yet.", flag:null},
+    {id:1850615,name:"Shop test manifold",client:"Shop",status:"#LEAD",pct:null},
+    {id:1850619,name:"UPS Tractor",client:"UPS Tractor Maintenance Shop",status:"#ACTIVE",pct:null,pm:"Jef Frick"},
+    {id:1939643,name:"Hoffman AI Breeders Oxygen Monitoring System 2.0 (Macurco)",client:"Rocky Mountain Air",status:"#ACTIVE",pct:null,pm:"Jef Frick"},
+    {id:1972178,name:"UC Berkeley LN2 Pipe, Controls and Detection System",client:"UC Berkeley CA",status:"#PROPOSAL_EXPIRED",pct:null,pm:"Jef Frick"},
+    {id:2066719,name:"RMA Sterling USP Oxy Truck Fill, Dewar Fill and Analytical",client:"Rocky Mountain Air",status:"#ACTIVE",pct:394.77,pm:"Wes Frick"},
+    {id:2129781,name:"ABSL Power Solutions TVAC Chamber Services",client:"ABSL Power Solutions Inc",status:"#PENDING_CHANGES",pct:38.34,
+      recent:true, phases:[{n:"Design Phase",s:"pending"},{n:"Permitting",s:"pending"},{n:"Installation",s:"pending",sched:"Sep 21, 2026"},{n:"Commissioning and Certification",s:"pending"}],
+      summary:"Awaiting a change-order decision from the client before proceeding. Installation phase is scheduled for Sep 21 once that's resolved.", flag:"Pending change order — blocking the scheduled Sep 21 install"},
+    {id:2177798,name:"Idaho National Lab LN2 Dewar Filling Safety System",client:"Idaho National Laboratory",status:"#PROPOSAL_EXPIRED",pct:0,pm:"Jef Frick"},
+    {id:2198334,name:"Cesium Astro Nitrogen System Revision 3.0",client:"Cesium Astro",status:"#PENDING_CHANGES",pct:3.73,pm:"Jef Frick",
+      recent:true, phases:[{n:"Initial Inspection and Scope Development",s:"pending"},{n:"Design Phase",s:"pending"},{n:"Permitting",s:"pending"},{n:"Installation",s:"pending",sched:"Aug 21 – Sep 3, 2026"},{n:"Commissioning and Certification",s:"pending"},{n:"Training and Turnover",s:"pending"}],
+      summary:"Trailer and a tank delivered to site per the client's request (Sep 14). Crew is now working the pipeline near the break room and coordinating with a caulking contractor, likely for a wall or roof penetration.", flag:null},
+    {id:2211615,name:"RMA Colorado Springs Oxy Truck Fill, Dewar Fill and Analytical",client:"Rocky Mountain Air",status:"#ACTIVE",pct:null},
+    {id:2214190,name:"RMA Laramie USP Truck, Dewar Fill, and Analytics",client:"Rocky Mountain Air",status:"#ACTIVE",pct:null},
+    {id:2300640,name:"Northern Colorado Medical Center Oxygen System Upgrade",client:"Rocky Mountain Air",status:"#ACTIVE",pct:50.57,pm:"Wes Frick",
+      recent:true, phases:[{n:"Design Phase",s:"pending"},{n:"Procure Materials",s:"pending"},{n:"Mobilization",s:"pending",sched:"Aug 27, 2026"},{n:"Install Temporary Supply MHU Trailer",s:"pending",sched:"Aug 28, 2026"},{n:"Installation",s:"pending",sched:"Sep 8, 2026"},{n:"Training and Turnover",s:"pending",sched:"Sep 9, 2026"},{n:"Demobilize",s:"pending"},{n:"Shelter",s:"pending"}],
+      summary:"Piping from the final line manifold to supply stubs is in and commissioned. The facility is running on the trailer supply while permanent piping gets insulated — insulators arrived Sep 9 and piping was labeled and secured by Sep 15. Handover packet was ~80% done as of Sep 4, with handover to the client targeted for the following week.",
+      flag:"Ice was spotted protruding through the insulation at the primary valve/safety (Sep 15 note) — unresolved as of the last entry."},
+    {id:2421936,name:"Technical Support and Consultation",client:"Rocky Mountain Air",status:"#ACTIVE",pct:null},
+    {id:2427519,name:"AeroCare - CCX-R20",client:"Rocky Mountain Air",status:"#ACTIVE",pct:null},
+    {id:2457852,name:"Cesium Astro Gas Detection",client:"Cesium Astro",status:"#ACTIVE",pct:4.19,pm:"Jef Frick",
+      phases:[{n:"Design Phase",s:"pending",sched:"Oct 19 – Nov 8, 2025"},{n:"Permitting",s:"pending",sched:"Nov 10 – 30, 2025"},{n:"Procure Materials",s:"pending",sched:"Oct 20 – Nov 19, 2025"},{n:"Installation",s:"pending",sched:"Nov 30 – Dec 13, 2025"},{n:"Calibrate/Test/Certify Gas Detection System",s:"pending",sched:"Dec 14 – 15, 2025"},{n:"Training and Turnover",s:"pending",sched:"Dec 16 – 17, 2025"}]},
+    {id:2489873,name:"KP Seafood Spares R1052324",client:"King and Prince Seafood",status:"#ACTIVE",pct:null},
+    {id:2494369,name:"KP Seafood Filters for R1052738",client:"King and Prince Seafood",status:"#ACTIVE",pct:0},
+    {id:2508780,name:"Repair Acme Hospital Final Line Damaged In Transit",client:"Rocky Mountain Air",status:"#PROPOSAL_EXPIRED",pct:0},
+    {id:2540251,name:"Oxygen Flow Panel Clean for Oxygen Service",client:"Industrial Control LLC",status:"#ACTIVE",pct:38.59},
+    {id:2545633,name:"Rocky Mountain Respiratory Truck - 7849040",client:"Rocky Mountain Respiratory",status:"#LEAD",pct:null},
+    {id:2546255,name:"AeroCare Truck - APL-E42",client:"Aero Care",status:"#ACTIVE",pct:null},
+    {id:2547220,name:"Centaurus Farms Gas Detection/Life Safety System",client:"W Principles LLC",status:"#PENDING_CHANGES",pct:10.57,pm:"Wes Frick"},
+    {id:2586950,name:"Dragon Products Final Line Replacement",client:"Rocky Mountain Air",status:"#PROPOSAL_EXPIRED",pct:0},
+    {id:2617390,name:"AmeriGas Automated C3H8 Fill Line Detection and Safety",client:"Amerigas",status:"#PROPOSAL_EXPIRED",pct:0,pm:"Jef Frick"},
+    {id:2640029,name:"All Points North Oxygen Relocation Revision 3.0",client:"Rocky Mountain Air",status:"#ACTIVE",pct:0.17,
+      recent:true, phases:[{n:"Design Phase",s:"pending"},{n:"Procure Materials",s:"pending",sched:"Aug 19, 2026"},{n:"Relocate Existing Medical Oxygen System (+ vaporizer, vape cycler, final line, expanded reserve)",s:"pending"},{n:"Commissioning and Certification",s:"pending"},{n:"Training and Turnover",s:"pending"},{n:"Install 400' 1.5\" Supply Pipe to New Tie-In Point",s:"pending"},{n:"Third-Party Medical Gas Purity Certification",s:"pending"},{n:"Documentation",s:"pending"}],
+      summary:"Early days on this relocation — materials procurement underway, no installation activity logged yet."},
+    {id:2664618,name:"Pye Barker CO2 System Relocation",client:"General Air Service and Supply",status:"#ACTIVE",pct:20.74,pm:"Steve Cather",
+      recent:true, phases:[{n:"Design Phase",s:"pending"},{n:"Permitting",s:"pending"},{n:"Procure Materials",s:"pending"},{n:"Cryogenic System Installation",s:"pending"},{n:"Commissioning and Certification (ASME B31.3 leak test)",s:"pending"},{n:"Install Required Signage",s:"pending"},{n:"Gas Detection and Control System Phase",s:"pending"}]},
+    {id:2674214,name:"KP Seafood Spares for PO R1053923",client:"King and Prince Seafood",status:"#ACTIVE",pct:0},
+    {id:2680740,name:"Cesium Astro LN2 System Change Orders #2 and #3",client:"Cesium Astro",status:"#ACTIVE",pct:1.77,
+      recent:true, phases:[{n:"Procure Materials",s:"pending"},{n:"Install Vacuum Insulated Pipe System for LN2",s:"pending",sched:"Sep 14 – 18, 2026"}],
+      summary:"Materials procurement in progress; the LN2 vacuum-insulated pipe install is scheduled for Sep 14–18."},
+    {id:2693994,name:"Red Bird Farms SGS Safe Touch Pro Blend Master Edition Control System",client:"Red Bird Farms",status:"#PROPOSAL_EXPIRED",pct:0},
+    {id:2702752,name:"Copy of RMA Dewars Repair",client:"Rocky Mountain Air",status:"#ACTIVE",pct:128.22,
+      recent:true, phasesRollup:"A second, larger dewar-repair batch — logged in Knowify but not yet started as of this snapshot.",
+      summary:"A follow-on batch of dewar repairs has been logged; no work against it yet as of the last check."},
+    {id:2735193,name:"MRI Global Vacuum Insulated Pipe (RFQ# RO-031226-Rev 0)",client:"MRI Global",status:"#ACTIVE",pct:0,recent:true},
+    {id:2736381,name:"Sundyne HP N2 Cyls Upgrades and Maintenance",client:"Sundyne",status:"#PROPOSAL_EXPIRED",pct:0},
+    {id:2771307,name:"USDA Phase 2 VJ Pipe Row 3",client:"USDA",status:"#PROPOSAL_EXPIRED",pct:0},
+    {id:2777131,name:"Cesium Astro Gas Detection Change Order 1 (PO 019430)",client:"Cesium Astro",status:"#ACTIVE",pct:5.02,recent:true},
+    {id:2779367,name:"KP Seafood PO R1044389",client:"King and Prince Seafood",status:"#ACTIVE",pct:0},
+    {id:2779422,name:"KP Seafood PO R1054294",client:"King and Prince Seafood",status:"#ACTIVE",pct:0},
+    {id:2788629,name:"Cesium Astro 9000 Gallon Installation",client:"Rocky Mountain Air",status:"#PROPOSAL_EXPIRED",pct:12.12,recent:true},
+    {id:2800167,name:"Restore Boulder Removal and Transport",client:"Rocky Mountain Air",status:"#PROPOSAL_EXPIRED",pct:1.66},
+    {id:2805252,name:"Cesium Astro Change Order 4 - Design Related Changes",client:"Cesium Astro",status:"#BIDDING",pct:0},
+    {id:2805254,name:"Cesium Astro Change Order 5",client:"Cesium Astro",status:"#ACTIVE",pct:0},
+    {id:2829669,name:"Copy of Cesium Astro 9000 Gallon Installation",client:"Rocky Mountain Air",status:"#BIDDING",pct:0.65},
+    {id:2846237,name:"Marston Water Plant Repairs After Inspection",client:"Rocky Mountain Air",status:"#OUT_FOR_SIGNATURE",pct:0},
+    {id:2851176,name:"Cylinder Covers for Size 300/Tin Cleanroom Area",client:"Johnson and Johnson",status:"#PROPOSAL_EXPIRED",pct:0},
+    {id:2852899,name:"KP Seafood PO#R1054790",client:"King and Prince Seafood",status:"#ACTIVE",pct:0},
+    {id:2852998,name:"KP Seafood PO#R1054817",client:"King and Prince Seafood",status:"#ACTIVE",pct:110.34},
+    {id:2859014,name:"Cesium Astro 5500 Liter Install",client:"Rocky Mountain Air",status:"#PROPOSAL_EXPIRED",pct:22.04,
+      recent:true, summary:"Logistics/prep phase — trailer hardware sourced, then the 5500L tank and vaporizer loaded for delivery to Cesium Astro. Nothing flagged as of the last entry."},
+    {id:2870553,name:"LNG ISO Vessel Inspection - Olson Greenhouse",client:"Olson Greenhouse",status:"#ACTIVE",pct:0},
+    {id:2870664,name:"Portable CO2 and Oxygen Detectors for Drivers",client:"Rocky Mountain Air",status:"#ACTIVE",pct:null,recent:true},
+    {id:2876828,name:"Precision Neuroscience LN2 System Consultation",client:"Precision Neuroscience",status:"#ACTIVE",pct:0},
+    {id:2888214,name:"Red Bird Farms 30% CO2 Balance N2 Blending System (Witt MG 1,000)",client:"Red Bird Farms",status:"#BIDDING",pct:0},
+    {id:2888816,name:"Red Bird Farms 30% CO2 Balance N2 Blending System (2ea Thermco 8305)",client:"Red Bird Farms",status:"#PROPOSAL_EXPIRED",pct:0},
+    {id:2894780,name:"Cesium Astro Gas Detection CO 4 - Horn Strobes/Signage",client:"Cesium Astro",status:"#ACTIVE",pct:null,recent:true},
+    {id:2900981,name:"Steves Gas Bag",client:"Steve",status:"#ACTIVE",pct:0},
+    {id:2901738,name:"HCI Work Flow Template",client:"Safe Gas Systems",status:"#LEAD",pct:0,pm:"Steve Cather"},
+    {id:2902775,name:"MoxTek Forced Air Vaporizer Upgrade",client:"Rocky Mountain Air",status:"#LEAD",pct:0},
+    {id:2904013,name:"UPS Tractor Shop Gas Detection and Control System Repairs",client:"UPS Tractor Maintenance Shop",status:"#PROPOSAL_EXPIRED",pct:0},
+    {id:2904034,name:"Greeley Water CNG Leak",client:"City Of Greeley",status:"#ACTIVE",pct:16.80,recent:true},
+    {id:2904068,name:"UNC 500 Nitrogen Repairs After Inspection",client:"University of Northern Colorado",status:"#ACTIVE",pct:12.02,
+      recent:true, summary:"Two routine check-in visits post-repair. System is stable and MHU refill timing is being monitored ahead of insulation work.",
+      flag:"A safety valve on the reserve line (post-regulator) was bleeding off (Sep 6) and needs an economizer adjustment."},
+    {id:2919615,name:"CSU 6000 Gallon Tank Swap",client:"Rocky Mountain Air",status:"#ACTIVE",pct:null},
+    {id:2947864,name:"Design Phase — Red Bird Farms 30% CO2 Balance N2 Blending System",client:"Red Bird Farms",status:"#OUT_FOR_SIGNATURE",pct:0},
+    {id:2949539,name:"KP Seafood July 29th - Aug 1 Service Trip",client:"King and Prince Seafood",status:"#ACTIVE",pct:null,recent:true},
+    {id:2955239,name:"KP Seafood Sample Line Getter Columns",client:"King and Prince Seafood",status:"#ACTIVE",pct:null},
+    {id:2958715,name:"Sundyne CO2 Regulator Replacement",client:"Sundyne",status:"#ACTIVE",pct:0,recent:true},
+    {id:2998111,name:"Red Bird Farms Vacuum Insulated Piping System Design",client:"Red Bird Farms",status:"#OUT_FOR_SIGNATURE",pct:0},
+    {id:2999994,name:"NASA Clean Room Cylinder Cover",client:"NASA, Ames Research Center",status:"#ACTIVE",pct:0,pm:"Brandon S Myers"},
+    {id:3001622,name:"McCook Community Hospital Oxygen System Upgrade",client:"Rocky Mountain Air",status:"#LEAD",pct:0.06,recent:true},
+    {id:3006645,name:"KP Seafood - Oxygen Sensor With Cable And Pigtail",client:"King and Prince Seafood",status:"#ACTIVE",pct:null,recent:true},
+    {id:3006700,name:"KP Seafood - 4 Way Versa Valve",client:"King and Prince Seafood",status:"#ACTIVE",pct:null},
+    {id:3012406,name:"KP Seafood FPEC 2 Trip 8/28-9/5",client:"King and Prince Seafood",status:"#ACTIVE",pct:0.94,recent:true},
+    {id:3017639,name:"Carbon County Oxygen System Upgrade",client:"Rocky Mountain Air",status:"#LEAD",pct:0},
+    {id:3021709,name:"Denver Gas Management Haz Mat Permit",client:"Denver Gas Management",status:"#ACTIVE",pct:0},
+    {id:3027944,name:"USDA Dewars Inspections, Repair and Relief Candy Cane Install",client:"USDA",status:"#BIDDING",pct:0},
+    {id:3028618,name:"Cesium Astro LN2 Drop 6'",client:"Cesium Astro",status:"#ACTIVE",pct:0},
+    {id:3030705,name:"Olson Greenhouse LNG ISO Relief Replacements",client:"Olson Greenhouse",status:"#ACTIVE",pct:0},
+    {id:3038039,name:"Phillips Plumbing Oxygen Clean Parts",client:"Phillips Plumbing",status:"#OUT_FOR_SIGNATURE",pct:null},
+    {id:3055340,name:"Modera Parking Structure Gas Detection System Inspection",client:"Modera West Wash Park",status:"#OUT_FOR_SIGNATURE",pct:0,recent:true},
+    {id:3055805,name:"Pico Cyl Analyzer Display Repair",client:"Rocky Mountain Air",status:"#OUT_FOR_SIGNATURE",pct:0,recent:true},
+    {id:3060939,name:"NIST BMF/PIF Outdoor Liquid Nitrogen System Upgrade",client:"National Institute of Standards and Technology (NIST)",status:"#BIDDING",pct:0,recent:true},
+    {id:3063594,name:"Element New VJ Pipe Drop",client:"Element",status:"#OUT_FOR_SIGNATURE",pct:0,recent:true},
+    {id:3083929,name:"KP Seafood Getter Column Installation Trip",client:"King and Prince Seafood",status:"#ACTIVE",pct:0}
+  ];
+
+  function stageOf(p) { return STAGE[p.status] || 'pipeline'; }
+  function healthPill(p) {
+    if (p.flag) return {cls:'warning', label:'Needs a decision'};
+    if (p.status === '#PENDING_CHANGES') return {cls:'warning', label:'Pending change order'};
+    if (stageOf(p) === 'pipeline') return {cls:'neutral', label: STATUS_LABEL[p.status]};
+    if (p.recent) return {cls:'good', label:'Progressing'};
+    return {cls:'neutral', label:'Quiet'};
+  }
+
+  // ---- KPIs ----
+  var execution = projects.filter(function(p){ return stageOf(p) === 'execution'; });
+  var pipeline = projects.filter(function(p){ return stageOf(p) === 'pipeline'; });
+  var touched = projects.filter(function(p){ return p.recent; });
+  var flagged = projects.filter(function(p){ return p.flag; });
+  var kpis = [
+    {label:'Jobs In Execution', value: execution.length, sub: pipeline.length + ' more in pipeline / bidding'},
+    {label:'Touched Last 14 Days', value: touched.length, sub: 'of ' + projects.length + ' open contract jobs'},
+    {label:'Flagged For A Decision', value: flagged.length, cls: flagged.length ? 'warn' : '', sub: flagged.length ? 'see Short-Term Pulse' : 'nothing outstanding'},
+    {label:'Awaiting Client / Signature', value: projects.filter(function(p){return p.status==='#BIDDING'||p.status==='#OUT_FOR_SIGNATURE';}).length, sub: projects.filter(function(p){return p.status==='#PROPOSAL_EXPIRED';}).length + ' proposals expired'}
+  ];
+  document.getElementById('kpis').innerHTML = kpis.map(function(k){
+    return '<div class="kpi"><span class="label">'+k.label+'</span><span class="value '+(k.cls||'')+'">'+k.value+'</span><span class="sub">'+k.sub+'</span></div>';
+  }).join('');
+
+  // ---- Short-Term Pulse ----
+  var pulseProjects = touched.slice().sort(function(a,b){
+    // flagged first, then those with a summary, then rest
+    return (b.flag?2:b.summary?1:0) - (a.flag?2:a.summary?1:0);
+  });
+  document.getElementById('pulse-list').innerHTML = pulseProjects.map(function(p){
+    var h = healthPill(p);
+    var pctHtml = (p.pct !== null && p.pct !== undefined) ? '<div class="progress-track"><div class="progress-fill" style="width:'+Math.min(100,p.pct)+'%"></div></div>' : '';
+    var summaryHtml = p.summary ? '<div class="summary">'+p.summary+'</div>' : '<div class="summary" style="color:var(--text-muted);font-style:italic;">Activity logged, but no written notes to summarize yet.</div>';
+    var flagHtml = p.flag ? '<div class="flag"><span class="ico">⚑</span>'+p.flag+'</div>' : '';
+    return '<div class="pulse-card" data-id="'+p.id+'">'+
+      '<div class="row1"><div><div class="proj">'+p.name+'</div><div class="client">'+p.client+'</div></div>'+
+      '<div style="text-align:right"><span class="pill '+h.cls+'">'+h.label+'</span><div class="meta">'+(p.pct!==null&&p.pct!==undefined? Math.round(p.pct)+'% complete':'')+'</div></div></div>'+
+      summaryHtml + flagHtml + pctHtml +
+      '</div>';
+  }).join('');
+
+  // ---- Full table ----
+  function renderTable(list) {
+    document.getElementById('full-tbody').innerHTML = list.map(function(p){
+      var h = healthPill(p);
+      var pctVal = (p.pct !== null && p.pct !== undefined) ? Math.round(p.pct) : null;
+      var barHtml = pctVal !== null ? '<span class="mini-bar"><span style="width:'+Math.min(100,pctVal)+'%"></span></span>'+pctVal+'%' : '<span style="color:var(--text-muted)">—</span>';
+      return '<tr class="rowbtn" data-id="'+p.id+'">'+
+        '<td class="name">'+p.name+'</td>'+
+        '<td>'+p.client+'</td>'+
+        '<td><span class="pill '+h.cls+'">'+h.label+'</span></td>'+
+        '<td class="pct">'+barHtml+'</td>'+
+        '<td>'+(p.pm||'<span style="color:var(--text-muted)">—</span>')+'</td>'+
+        '</tr>';
+    }).join('');
+    attachRowHandlers();
+  }
+  renderTable(projects);
+
+  var currentFilter = 'all';
+  function applyFilters() {
+    var q = document.getElementById('search-input').value.trim().toLowerCase();
+    var list = projects.filter(function(p){
+      if (currentFilter !== 'all' && stageOf(p) !== currentFilter) return false;
+      if (q && p.name.toLowerCase().indexOf(q) === -1 && p.client.toLowerCase().indexOf(q) === -1) return false;
+      return true;
+    });
+    renderTable(list);
+  }
+  document.getElementById('search-input').addEventListener('input', applyFilters);
+  document.querySelectorAll('.filter-chip').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.filter-chip').forEach(function(b){ b.setAttribute('aria-pressed','false'); });
+      btn.setAttribute('aria-pressed','true');
+      currentFilter = btn.dataset.filter;
+      applyFilters();
+    });
+  });
+
+  // ---- Tabs ----
+  function selectTab(which){
+    document.getElementById('tab-pulse').setAttribute('aria-selected', which==='pulse');
+    document.getElementById('tab-all').setAttribute('aria-selected', which==='all');
+    document.getElementById('panel-pulse').classList.toggle('active', which==='pulse');
+    document.getElementById('panel-all').classList.toggle('active', which==='all');
+  }
+  document.getElementById('tab-pulse').addEventListener('click', function(){ selectTab('pulse'); });
+  document.getElementById('tab-all').addEventListener('click', function(){ selectTab('all'); });
+
+  // ---- Drill-down drawer ----
+  var overlay = document.getElementById('overlay');
+  var drawer = document.getElementById('drawer');
+  function openDrawer(id){
+    var p = projects.filter(function(x){ return x.id === id; })[0];
+    if (!p) return;
+    var h = healthPill(p);
+    var kv = [
+      {k:'Status', v: STATUS_LABEL[p.status]},
+      {k:'% Complete', v: (p.pct!==null&&p.pct!==undefined) ? Math.round(p.pct)+'%' : '—'},
+      {k:'Project Manager', v: p.pm || '—'},
+      {k:'Client', v: p.client}
+    ];
+    var kvHtml = kv.map(function(x){ return '<div class="kv-item"><div class="k">'+x.k+'</div><div class="v">'+x.v+'</div></div>'; }).join('');
+
+    var narrativeHtml = '';
+    if (p.summary || p.flag) {
+      narrativeHtml = '<h3>Recent activity</h3><div class="narrative">' + (p.summary||'') + (p.flag ? '<span class="flag">⚑ '+p.flag+'</span>' : '') + '</div>';
+    } else if (p.recent) {
+      narrativeHtml = '<h3>Recent activity</h3><div class="narrative">Touched in the last 14 days, but no written comments were logged to summarize.</div>';
+    }
+
+    var phasesHtml = '';
+    if (p.phasesRollup) {
+      phasesHtml = '<h3>Phases</h3><div class="no-detail">'+p.phasesRollup+'</div>';
+    } else if (p.phases && p.phases.length) {
+      phasesHtml = '<h3>Phases</h3>' + p.phases.map(function(ph){
+        return '<div class="phase-row"><span>'+ph.n+(ph.sched?' <span style="color:var(--text-muted);font-size:11.5px;">— '+ph.sched+'</span>':'')+'</span><span class="state '+ph.s+'">'+(ph.s==='active'?'Active':ph.s==='closed'?'Closed':'Pending')+'</span></div>';
+      }).join('');
+    } else {
+      phasesHtml = '<h3>Phases</h3><div class="no-detail">No detailed phase breakdown on file for this job — see Knowify for full detail.</div>';
+    }
+
+    document.getElementById('drawer-content').innerHTML =
+      '<span class="pill '+h.cls+'">'+h.label+'</span>' +
+      '<h2>'+p.name+'</h2>' +
+      '<div class="client">'+p.client+'</div>' +
+      '<div class="kv">'+kvHtml+'</div>' +
+      narrativeHtml + phasesHtml;
+
+    overlay.classList.add('open');
+    drawer.classList.add('open');
+  }
+  function closeDrawer(){ overlay.classList.remove('open'); drawer.classList.remove('open'); }
+  overlay.addEventListener('click', closeDrawer);
+  document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+
+  function attachRowHandlers(){
+    document.querySelectorAll('.rowbtn').forEach(function(row){
+      row.addEventListener('click', function(){ openDrawer(parseInt(row.dataset.id,10)); });
+    });
+  }
+  attachRowHandlers();
+  document.querySelectorAll('.pulse-card').forEach(function(card){
+    card.addEventListener('click', function(){ openDrawer(parseInt(card.dataset.id,10)); });
+  });
+})();
+</script>
