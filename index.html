@@ -155,6 +155,22 @@
   .mini-bar { display: inline-block; width: 54px; height: 5px; border-radius: 3px; background: var(--gridline); overflow: hidden; vertical-align: middle; margin-right: 6px; }
   .mini-bar > span { display: block; height: 100%; background: var(--accent); }
 
+  /* Insights charts */
+  .insights-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  @media (min-width: 860px) { .insights-grid { grid-template-columns: 1fr 1fr; } .insights-grid .chart-card.wide { grid-column: 1 / -1; } }
+  .chart-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px 14px; }
+  .chart-card h3 { font-size: 13px; font-weight: 700; margin: 0 0 2px; color: var(--text-primary); }
+  .chart-card .chart-note { font-size: 11.5px; color: var(--text-muted); margin: 0 0 14px; }
+  .bar-chart { display: flex; flex-direction: column; gap: 8px; }
+  .bar-row { display: grid; grid-template-columns: minmax(84px, 148px) 1fr 44px; align-items: center; gap: 8px; }
+  .bar-row .bar-cat { font-size: 12px; line-height: 1.25; color: var(--text-secondary); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .bar-row .bar-track { position: relative; height: 16px; }
+  .bar-row .bar-fill { position: absolute; left: 0; top: 2px; height: 12px; border-radius: 4px; background: var(--accent); min-width: 4px; transition: width .3s ease; }
+  .bar-row .bar-fill:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .bar-row .bar-val { font-size: 12px; font-weight: 600; color: var(--text-primary); text-align: right; font-variant-numeric: tabular-nums; }
+  .bar-row.muted .bar-fill { background: var(--text-muted); opacity: .55; }
+  .bar-row.muted .bar-cat, .bar-row.muted .bar-val { color: var(--text-muted); }
+
   /* Drill-down overlay */
   .overlay { position: fixed; inset: 0; background: rgba(11,11,11,0.35); display: none; z-index: 30; }
   .overlay.open { display: block; }
@@ -201,6 +217,7 @@
     <div role="tablist" class="tabs" aria-label="Dashboard view">
       <button class="tab" id="tab-pulse" role="tab" aria-selected="true" aria-controls="panel-pulse">Short-Term Pulse</button>
       <button class="tab" id="tab-all" role="tab" aria-selected="false" aria-controls="panel-all">All Projects</button>
+      <button class="tab" id="tab-insights" role="tab" aria-selected="false" aria-controls="panel-insights">Insights</button>
     </div>
 
     <section class="panel active" id="panel-pulse" role="tabpanel" aria-labelledby="tab-pulse">
@@ -226,6 +243,11 @@
           <tbody id="full-tbody"></tbody>
         </table>
       </div>
+    </section>
+
+    <section class="panel" id="panel-insights" role="tabpanel" aria-labelledby="tab-insights">
+      <p style="font-size:13px;color:var(--text-secondary);margin:0 0 14px;">A breakdown of the same 82 open contract jobs, computed live from the data above.</p>
+      <div class="insights-grid" id="insights-grid"></div>
     </section>
 
     <footer class="note">
@@ -387,6 +409,58 @@
     return '<div class="kpi"><span class="label">'+k.label+'</span><span class="value '+(k.cls||'')+'">'+k.value+'</span><span class="sub">'+k.sub+'</span></div>';
   }).join('');
 
+  // ---- Insights (computed from the same projects array) ----
+  function renderBarChart(rows) {
+    var max = Math.max.apply(null, rows.map(function(r){ return r.val; })) || 1;
+    return '<div class="bar-chart">' + rows.map(function(r){
+      var pct = Math.max(2, Math.round((r.val / max) * 100));
+      var title = r.cat + ': ' + r.val;
+      return '<div class="bar-row'+(r.muted?' muted':'')+'" title="'+title+'">' +
+        '<span class="bar-cat">'+r.cat+'</span>' +
+        '<span class="bar-track"><span class="bar-fill" tabindex="0" aria-label="'+title+'" style="width:'+pct+'%"></span></span>' +
+        '<span class="bar-val">'+r.val+'</span>' +
+        '</div>';
+    }).join('') + '</div>';
+  }
+  function renderInsights() {
+    // Jobs by status
+    var statusCounts = {};
+    projects.forEach(function(p){ statusCounts[p.status] = (statusCounts[p.status]||0) + 1; });
+    var statusRows = Object.keys(statusCounts).map(function(s){
+      return {cat: STATUS_LABEL[s] || s, val: statusCounts[s]};
+    }).sort(function(a,b){ return b.val - a.val; });
+
+    // Workload by project manager
+    var pmCounts = {};
+    projects.forEach(function(p){ var pm = (p.pm||'').trim() || 'Unassigned'; pmCounts[pm] = (pmCounts[pm]||0) + 1; });
+    var pmRows = Object.keys(pmCounts).map(function(pm){
+      return {cat: pm, val: pmCounts[pm], muted: pm === 'Unassigned'};
+    }).sort(function(a,b){ return b.val - a.val; });
+
+    // % complete distribution among active jobs
+    var activeJobs = projects.filter(function(p){ return p.status === '#ACTIVE'; });
+    var buckets = [
+      {key:'nodata', cat:'No % logged', test: function(p){ return p.pct===null||p.pct===undefined; }},
+      {key:'0', cat:'0%', test: function(p){ return p.pct===0; }},
+      {key:'1-24', cat:'1–24%', test: function(p){ return p.pct>0 && p.pct<25; }},
+      {key:'25-49', cat:'25–49%', test: function(p){ return p.pct>=25 && p.pct<50; }},
+      {key:'50-74', cat:'50–74%', test: function(p){ return p.pct>=50 && p.pct<75; }},
+      {key:'75-99', cat:'75–99%', test: function(p){ return p.pct>=75 && p.pct<100; }},
+      {key:'100', cat:'100%', test: function(p){ return p.pct>=100; }}
+    ];
+    var pctRows = buckets.map(function(b){
+      return {cat: b.cat, val: activeJobs.filter(b.test).length, muted: b.key==='nodata'};
+    });
+
+    var grid = document.getElementById('insights-grid');
+    if (!grid) return;
+    grid.innerHTML =
+      '<div class="chart-card"><h3>Jobs by status</h3><p class="chart-note">All '+projects.length+' open contract jobs, by their current Knowify status.</p>' + renderBarChart(statusRows) + '</div>' +
+      '<div class="chart-card"><h3>Workload by project manager</h3><p class="chart-note">Most jobs don\'t have a PM assigned in Knowify yet — that gap is real, not a rendering issue.</p>' + renderBarChart(pmRows) + '</div>' +
+      '<div class="chart-card wide"><h3>% complete among active jobs</h3><p class="chart-note">Of '+activeJobs.length+' jobs marked Active, this is how far along they are.</p>' + renderBarChart(pctRows) + '</div>';
+  }
+  renderInsights();
+
   // ---- Short-Term Pulse ----
   var pulseProjects = touched.slice().sort(function(a,b){
     // flagged first, then those with a summary, then rest
@@ -446,11 +520,14 @@
   function selectTab(which){
     document.getElementById('tab-pulse').setAttribute('aria-selected', which==='pulse');
     document.getElementById('tab-all').setAttribute('aria-selected', which==='all');
+    document.getElementById('tab-insights').setAttribute('aria-selected', which==='insights');
     document.getElementById('panel-pulse').classList.toggle('active', which==='pulse');
     document.getElementById('panel-all').classList.toggle('active', which==='all');
+    document.getElementById('panel-insights').classList.toggle('active', which==='insights');
   }
   document.getElementById('tab-pulse').addEventListener('click', function(){ selectTab('pulse'); });
   document.getElementById('tab-all').addEventListener('click', function(){ selectTab('all'); });
+  document.getElementById('tab-insights').addEventListener('click', function(){ selectTab('insights'); });
 
   // ---- Drill-down drawer ----
   var overlay = document.getElementById('overlay');
