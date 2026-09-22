@@ -213,6 +213,42 @@
   .cal-day .evt { font-size: 10.5px; line-height: 1.35; background: var(--accent-wash); color: var(--accent); border-radius: 5px; padding: 3px 5px; cursor: pointer; overflow: hidden; overflow-wrap: anywhere; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
   .cal-day .evt:hover { filter: brightness(0.95); }
   @media (max-width: 700px) { .cal-day { min-height: 60px; padding: 6px; } .cal-day .evt { font-size: 9.5px; -webkit-line-clamp: 1; } .cal-weekdays span { font-size: 9.5px; } }
+
+  /* This Week / weather */
+  .week-section { margin-bottom: 26px; }
+  .week-section h2 { font-size: 14px; font-weight: 700; margin: 0 0 4px; }
+  .week-section .week-note { font-size: 12.5px; color: var(--text-muted); margin: 0 0 14px; }
+  .weather-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 720px) { .weather-grid { grid-template-columns: 1fr 1fr; } }
+  .wx-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+  .wx-card .wx-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 2px; flex-wrap: wrap; }
+  .wx-card .wx-site { font-size: 14px; font-weight: 700; }
+  .wx-card .wx-loc { font-size: 11.5px; color: var(--text-muted); white-space: nowrap; }
+  .wx-card .wx-jobs { font-size: 11.5px; color: var(--text-muted); margin: 2px 0 10px; }
+  .wx-days { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: 4px; margin-bottom: 8px; }
+  .wx-day { background: var(--surface-3); border-radius: 8px; padding: 6px 3px; text-align: center; }
+  .wx-day .wd { font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); }
+  .wx-day .hi { font-size: 12.5px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .wx-day .lo { font-size: 11px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+  .wx-day .ic { font-size: 12px; margin-top: 2px; }
+  .wx-day.risk-warning { background: var(--warning-wash); }
+  .wx-day.risk-warning .hi, .wx-day.risk-warning .lo { color: var(--warning); }
+  .wx-day.risk-critical { background: var(--critical-wash); }
+  .wx-day.risk-critical .hi, .wx-day.risk-critical .lo { color: var(--critical); }
+  .wx-alert { font-size: 12.5px; font-weight: 600; padding: 7px 10px; border-radius: 8px; line-height: 1.4; }
+  .wx-alert.warning { background: var(--warning-wash); color: var(--warning); }
+  .wx-alert.critical { background: var(--critical-wash); color: var(--critical); }
+  .wx-alert.ok { background: var(--good-wash); color: var(--good); font-weight: 500; }
+  .wx-loading { font-size: 12.5px; color: var(--text-muted); font-style: italic; }
+
+  .activity-list { display: flex; flex-direction: column; gap: 8px; }
+  .activity-item { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; font-size: 13px; display: flex; gap: 12px; cursor: pointer; }
+  .activity-item:hover { box-shadow: var(--shadow); }
+  .activity-item .a-when { flex: 0 0 64px; font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em; padding-top: 1px; }
+  .activity-item .a-when.future { color: var(--accent); }
+  .activity-item .a-body .a-proj { font-weight: 700; font-size: 13px; }
+  .activity-item .a-body .a-client { font-size: 11.5px; color: var(--text-muted); margin-bottom: 3px; }
+  .activity-item .a-body .a-text { color: var(--text-secondary); line-height: 1.45; }
 </style>
 
 <div class="viz-root">
@@ -228,13 +264,27 @@
     <div class="kpis" id="kpis"></div>
 
     <div role="tablist" class="tabs" aria-label="Dashboard view">
-      <button class="tab" id="tab-pulse" role="tab" aria-selected="true" aria-controls="panel-pulse">Short-Term Pulse</button>
+      <button class="tab" id="tab-week" role="tab" aria-selected="true" aria-controls="panel-week">This Week</button>
+      <button class="tab" id="tab-pulse" role="tab" aria-selected="false" aria-controls="panel-pulse">Short-Term Pulse</button>
       <button class="tab" id="tab-all" role="tab" aria-selected="false" aria-controls="panel-all">All Projects</button>
       <button class="tab" id="tab-insights" role="tab" aria-selected="false" aria-controls="panel-insights">Insights</button>
       <button class="tab" id="tab-calendar" role="tab" aria-selected="false" aria-controls="panel-calendar">Calendar</button>
     </div>
 
-    <section class="panel active" id="panel-pulse" role="tabpanel" aria-labelledby="tab-pulse">
+    <section class="panel active" id="panel-week" role="tabpanel" aria-labelledby="tab-week">
+      <div class="week-section">
+        <h2>Weather at active sites — next 7 days</h2>
+        <p class="week-note">Live forecast (Open-Meteo), fetched fresh every time this page loads — not tied to the daily data refresh. Flags overnight freezes, snow and high wind so exposed piping, dewars and portable gear can come inside ahead of time.</p>
+        <div class="weather-grid" id="weather-grid"></div>
+      </div>
+      <div class="week-section">
+        <h2>Recent &amp; upcoming activity</h2>
+        <p class="week-note">Field notes from the last 7 days, plus anything scheduled in the next 7. Click any item for the full job detail.</p>
+        <div class="activity-list" id="activity-list"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-pulse" role="tabpanel" aria-labelledby="tab-pulse">
       <p style="font-size:13px;color:var(--text-secondary);margin:0 0 14px;">Jobs with activity in the last 14 days, most recent first. Summaries are generated from field notes and comments logged in Knowify.</p>
       <div class="legend">
         <span class="item"><span class="swatch" style="background:var(--good)"></span> Progressing normally</span>
@@ -260,7 +310,7 @@
     </section>
 
     <section class="panel" id="panel-insights" role="tabpanel" aria-labelledby="tab-insights">
-      <p style="font-size:13px;color:var(--text-secondary);margin:0 0 14px;">A breakdown of the same 82 open contract jobs, computed live from the data above.</p>
+      <p style="font-size:13px;color:var(--text-secondary);margin:0 0 14px;" id="insights-note"></p>
       <div class="insights-grid" id="insights-grid"></div>
     </section>
 
@@ -284,8 +334,8 @@
 
 <script>
 (function () {
-  var asOf = new Date('2026-09-18T00:00:00Z');
-  document.getElementById('asof').innerHTML = 'Data as of<br><strong>Sep 18, 2026</strong>';
+  var asOf = new Date('2026-09-22T00:00:00Z');
+  document.getElementById('asof').innerHTML = 'Data as of<br><strong>Sep 22, 2026</strong>';
 
   // ---------------------------------------------------------------------
   // Real project data pulled from Knowify (JobsReport + Projects), scoped
@@ -298,10 +348,139 @@
   // Scheduled phase dates pulled from Knowify (Milestones where Scheduled=true).
   // Most jobs have no scheduled dates on file yet — this list is intentionally short.
   var calendarEvents = [
-    {date:'2026-09-14', endDate:'2026-09-18', projectId:2680740, label:'Install Vacuum Insulated Pipe System for LN2 (finishes today)'},
-    {date:'2026-09-21', projectId:2129781, label:'Installation'},
-    {date:'2026-09-21', projectId:2958715, label:'Labor — System Installation'}
+    {date:'2026-09-21', projectId:2958715, label:'Labor — System Installation'},
+    {date:'2026-09-22', projectId:3063594, label:'Procure Materials — Gas/Cryogenic System'},
+    {date:'2026-09-29', projectId:2904068, label:'Repair Cryogenic System'}
   ];
+
+  // ---------------------------------------------------------------------
+  // This Week tab: active-job site coordinates (straight from Knowify's
+  // JobsReport, which geocodes job addresses already — no separate
+  // geocoding step needed) plus a short hand-curated feed of the last 7
+  // days of field notes and the next 7 days of scheduled work. Sites
+  // without a project of their own borrow coordinates from a sibling job
+  // at the same physical location (e.g. other Cesium Astro change orders
+  // share the Cesium Astro Gas Detection site).
+  // ---------------------------------------------------------------------
+  var weekSites = [
+    {id:'sundyne', label:'Sundyne', loc:'Arvada, CO', lat:39.813976, lon:-105.168384, projectIds:[2958715]},
+    {id:'upstractor', label:'UPS Tractor Maintenance Shop', loc:'Commerce City, CO', lat:39.7907931, lon:-104.9194803, projectIds:[1850619]},
+    {id:'hoffman', label:'Hoffman AI Breeders', loc:'Logan, UT', lat:41.6974081, lon:-111.8584827, projectIds:[1939643]},
+    {id:'nuhi', label:'Nuhi Cannabis', loc:'Denver, CO', lat:39.786909, lon:-104.862750, projectIds:[]},
+    {id:'rmasterling', label:'RMA Sterling', loc:'Sterling, CO', lat:40.624425, lon:-103.227429, projectIds:[2066719]},
+    {id:'coorstek', label:'Coors Tek Argon System', loc:'Golden, CO', lat:39.7826362, lon:-105.1779824, projectIds:[]},
+    {id:'ncmc', label:'Northern Colorado Medical Center', loc:'Greeley, CO', lat:40.413831, lon:-104.707851, projectIds:[2300640]},
+    {id:'vagj', label:'VA Hospital Grand Junction', loc:'Grand Junction, CO', lat:39.07868, lon:-108.57531, projectIds:[]},
+    {id:'aerocare', label:'AeroCare', loc:'Longmont, CO', lat:40.1618574, lon:-105.0810243, projectIds:[2427519]},
+    {id:'cesium', label:'Cesium Astro', loc:'Westminster, CO', lat:39.898044, lon:-105.113084, projectIds:[2457852,2680740,2805254,2777131,2894780,3028618]},
+    {id:'nrel', label:'NREL FTLB', loc:'Golden, CO', lat:39.7409008, lon:-105.1751885, projectIds:[]},
+    {id:'dia', label:'Denver International Airport CUP', loc:'Denver, CO', lat:39.847586, lon:-104.673808, projectIds:[]}
+  ];
+
+  var recentActivity = [
+    {date:'2026-09-29', projectId:2904068, project:'UNC 500 Nitrogen Repairs After Inspection', client:'University of Northern Colorado', text:'Repair Cryogenic System — scheduled.', future:true},
+    {date:'2026-09-22', projectId:3063594, project:'Element New VJ Pipe Drop', client:'Element', text:'Materials procurement scheduled for the gas/cryogenic system.', future:true},
+    {date:'2026-09-21', projectId:2958715, project:'Sundyne CO2 Regulator Replacement', client:'Sundyne', text:'Changed out the second regulator on the CO2 line, set at 300 psi. Full PM inspection on nitrogen, CO2 and helium systems — corrected roughly 10 small leaks.'},
+    {date:'2026-09-21', projectId:0, project:'CoorsTek Gasket/Pump Switch', client:'Coors Tek Argon System', text:'Tightened bolts on both cold ends, bled pressure down, ran north & south pumps twice — no leaks, both operating normally.'},
+    {date:'2026-09-18', projectId:2300640, project:'Northern Colorado Medical Center Oxygen System Upgrade', client:'Rocky Mountain Air', text:'Insulation and labeling work wrapped up; ice was still noted protruding at the primary valve/safety as of the last site visit.'},
+    {date:'2026-09-16', projectId:2198334, project:'Cesium Astro Nitrogen System Revision 3.0', client:'Cesium Astro', text:'Delivered a trailer to Cesium Astro per Steve’s request; crew worked the pipeline near the break room and met with the caulking contractor.'},
+    {date:'2026-09-15', projectId:0, project:'Unload SLC 3000gal at RMA', client:'Rocky Mountain Air', text:'Unloaded a 3,000-gallon tank into the RMA yard. All parties on time.'}
+  ];
+
+  function fmtWeekday(d){ return d.toLocaleDateString('en-US',{weekday:'short'}); }
+  function riskClass(day){
+    if (day.snow > 0 || day.lo <= 20) return 'risk-critical';
+    if (day.lo <= 32 || day.wind >= 25 || day.precip >= 0.5) return 'risk-warning';
+    return '';
+  }
+  function siteAlert(days, site){
+    var worstIdx = 0, worstScore = -1;
+    days.forEach(function(d, i){
+      var score = (d.snow>0?3:0) + (d.lo<=20?3:d.lo<=32?2:0) + (d.wind>=25?1:0) + (d.precip>=0.5?1:0);
+      if (score > worstScore) { worstScore = score; worstIdx = i; }
+    });
+    if (worstScore <= 0) return {cls:'ok', text:'No frost, snow or high wind in the forecast this week.'};
+    var d = days[worstIdx];
+    var when = worstIdx === 0 ? 'today' : worstIdx === 1 ? 'tomorrow' : fmtWeekday(d.date);
+    var bits = [];
+    if (d.snow > 0) bits.push('snow');
+    if (d.lo <= 32) bits.push('a freeze (' + Math.round(d.lo) + '°F low)');
+    if (d.wind >= 25) bits.push('wind gusting past ' + Math.round(d.wind) + ' mph');
+    var cls = (d.snow>0 || d.lo<=20) ? 'critical' : 'warning';
+    return {cls: cls, text: 'Watch ' + when + ' at ' + site.label + ' — ' + bits.join(' and ') + '. Bring exposed piping, dewars and portable equipment inside if it’s outdoors.'};
+  }
+  function renderWeekSkeleton(){
+    var grid = document.getElementById('weather-grid');
+    if (!grid) return;
+    grid.innerHTML = weekSites.map(function(site){
+      var jobs = site.projectIds.map(function(id){
+        var p = projects.filter(function(x){return x.id===id;})[0];
+        return p ? p.name : null;
+      }).filter(Boolean);
+      return '<div class="wx-card" id="wx-'+site.id+'">' +
+        '<div class="wx-head"><span class="wx-site">'+site.label+'</span><span class="wx-loc">'+site.loc+'</span></div>' +
+        (jobs.length ? '<div class="wx-jobs">'+jobs.join(' · ')+'</div>' : '') +
+        '<div class="wx-loading">Loading forecast…</div>' +
+        '</div>';
+    }).join('');
+  }
+  function loadWeather(){
+    weekSites.forEach(function(site){
+      var url = 'https://api.open-meteo.com/v1/forecast?latitude='+site.lat+'&longitude='+site.lon+
+        '&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,snowfall_sum,windspeed_10m_max' +
+        '&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=auto&forecast_days=7';
+      fetch(url).then(function(r){ return r.json(); }).then(function(data){
+        var card = document.getElementById('wx-'+site.id);
+        if (!card || !data || !data.daily) { if (card) { var le = card.querySelector('.wx-loading'); if (le) le.textContent = 'Forecast unavailable.'; } return; }
+        var days = data.daily.time.map(function(t, i){
+          return {
+            date: new Date(t+'T00:00:00'),
+            hi: data.daily.temperature_2m_max[i],
+            lo: data.daily.temperature_2m_min[i],
+            precip: data.daily.precipitation_sum[i],
+            snow: data.daily.snowfall_sum[i],
+            wind: data.daily.windspeed_10m_max[i]
+          };
+        });
+        var alert = siteAlert(days, site);
+        var daysHtml = '<div class="wx-days">' + days.map(function(d, i){
+          var rc = riskClass(d);
+          var ic = d.snow > 0 ? '❄️' : (d.precip >= 0.3 ? '☔' : '');
+          return '<div class="wx-day '+rc+'"><div class="wd">'+(i===0?'Today':fmtWeekday(d.date))+'</div>' +
+            '<div class="hi">'+Math.round(d.hi)+'°</div><div class="lo">'+Math.round(d.lo)+'°</div>' +
+            (ic ? '<div class="ic">'+ic+'</div>' : '') + '</div>';
+        }).join('') + '</div>';
+        var loadingEl = card.querySelector('.wx-loading');
+        if (loadingEl) loadingEl.remove();
+        card.insertAdjacentHTML('beforeend', daysHtml + '<div class="wx-alert '+alert.cls+'">'+alert.text+'</div>');
+      }).catch(function(){
+        var card = document.getElementById('wx-'+site.id);
+        if (card) { var l = card.querySelector('.wx-loading'); if (l) l.textContent = 'Forecast unavailable right now — try reloading the page.'; }
+      });
+    });
+  }
+  function renderActivity(){
+    var today = new Date(); today.setHours(0,0,0,0);
+    var list = document.getElementById('activity-list');
+    if (!list) return;
+    var sorted = recentActivity.slice().sort(function(a,b){ return new Date(b.date) - new Date(a.date); });
+    list.innerHTML = sorted.map(function(a){
+      var d = new Date(a.date+'T00:00:00');
+      var diffDays = Math.round((d - today) / 86400000);
+      var when = diffDays === 0 ? 'Today' : diffDays === 1 ? 'Tomorrow' : diffDays === -1 ? 'Yesterday' : fmtMonthDay(d);
+      var hasDetail = a.projectId && projects.filter(function(p){return p.id===a.projectId;}).length;
+      return '<div class="activity-item" data-id="'+a.projectId+'">' +
+        '<div class="a-when'+(diffDays>0?' future':'')+'">'+when+'</div>' +
+        '<div class="a-body"><div class="a-proj">'+a.project+'</div><div class="a-client">'+a.client+'</div><div class="a-text">'+a.text+'</div></div>' +
+        '</div>';
+    }).join('');
+    document.querySelectorAll('.activity-item').forEach(function(el){
+      el.addEventListener('click', function(){
+        var id = parseInt(el.dataset.id,10);
+        if (id && projects.filter(function(p){return p.id===id;}).length) openDrawer(id);
+      });
+    });
+  }
 
   var STATUS_LABEL = {
     '#ACTIVE': 'Active', '#PENDING_CHANGES': 'Pending Change Order', '#LEAD': 'Lead',
@@ -323,7 +502,7 @@
       recent:true, phases:[{n:"Design Phase",s:"pending"},{n:"Permitting",s:"pending"},{n:"Installation",s:"pending",sched:"Sep 21, 2026"},{n:"Commissioning and Certification",s:"pending"}],
       summary:"Awaiting a change-order decision from the client before proceeding. Installation phase is scheduled for Sep 21 once that's resolved.", flag:"Pending change order — blocking the scheduled Sep 21 install"},
     {id:2177798,name:"Idaho National Lab LN2 Dewar Filling Safety System",client:"Idaho National Laboratory",status:"#PROPOSAL_EXPIRED",pct:0,pm:"Jef Frick"},
-    {id:2198334,name:"Cesium Astro Nitrogen System Revision 3.0",client:"Cesium Astro",status:"#PENDING_CHANGES",pct:3.73,pm:"Jef Frick",
+    {id:2198334,name:"Cesium Astro Nitrogen System Revision 3.0",client:"Cesium Astro",status:"#PENDING_CHANGES",pct:3.80,pm:"Jef Frick",
       recent:true, phases:[{n:"Initial Inspection and Scope Development",s:"pending"},{n:"Design Phase",s:"pending"},{n:"Permitting",s:"pending"},{n:"Installation",s:"pending",sched:"Aug 21 – Sep 3, 2026"},{n:"Commissioning and Certification",s:"pending"},{n:"Training and Turnover",s:"pending"}],
       summary:"Trailer and a tank delivered to site per the client's request (Sep 14). Crew is now working the pipeline near the break room and coordinating with a caulking contractor, likely for a wall or roof penetration.", flag:null},
     {id:2211615,name:"RMA Colorado Springs Oxy Truck Fill, Dewar Fill and Analytical",client:"Rocky Mountain Air",status:"#ACTIVE",pct:null},
@@ -391,15 +570,14 @@
       flag:"A safety valve on the reserve line (post-regulator) was bleeding off (Sep 6) and needs an economizer adjustment."},
     {id:2919615,name:"CSU 6000 Gallon Tank Swap",client:"Rocky Mountain Air",status:"#ACTIVE",pct:null},
     {id:2947864,name:"Design Phase — Red Bird Farms 30% CO2 Balance N2 Blending System",client:"Red Bird Farms",status:"#OUT_FOR_SIGNATURE",pct:0},
-    {id:2949539,name:"KP Seafood July 29th - Aug 1 Service Trip",client:"King and Prince Seafood",status:"#ACTIVE",pct:null,recent:true},
     {id:2955239,name:"KP Seafood Sample Line Getter Columns",client:"King and Prince Seafood",status:"#ACTIVE",pct:null},
-    {id:2958715,name:"Sundyne CO2 Regulator Replacement",client:"Sundyne",status:"#ACTIVE",pct:0,recent:true},
+    {id:2958715,name:"Sundyne CO2 Regulator Replacement",client:"Sundyne",status:"#ACTIVE",pct:5.93,
+      recent:true, summary:"Changed out the second regulator on the CO2 line, set at 300 psi. Full PM inspection run across the nitrogen, CO2 and helium systems — about 10 small leaks found and corrected, water level on the heater checked with no loss."},
     {id:2998111,name:"Red Bird Farms Vacuum Insulated Piping System Design",client:"Red Bird Farms",status:"#OUT_FOR_SIGNATURE",pct:0},
     {id:2999994,name:"NASA Clean Room Cylinder Cover",client:"NASA, Ames Research Center",status:"#ACTIVE",pct:0,pm:"Brandon S Myers"},
     {id:3001622,name:"McCook Community Hospital Oxygen System Upgrade",client:"Rocky Mountain Air",status:"#LEAD",pct:0.06,recent:true},
     {id:3006645,name:"KP Seafood - Oxygen Sensor With Cable And Pigtail",client:"King and Prince Seafood",status:"#ACTIVE",pct:null,recent:true},
     {id:3006700,name:"KP Seafood - 4 Way Versa Valve",client:"King and Prince Seafood",status:"#ACTIVE",pct:null},
-    {id:3012406,name:"KP Seafood FPEC 2 Trip 8/28-9/5",client:"King and Prince Seafood",status:"#ACTIVE",pct:0.94,recent:true},
     {id:3017639,name:"Carbon County Oxygen System Upgrade",client:"Rocky Mountain Air",status:"#LEAD",pct:0},
     {id:3021709,name:"Denver Gas Management Haz Mat Permit",client:"Denver Gas Management",status:"#ACTIVE",pct:0},
     {id:3027944,name:"USDA Dewars Inspections, Repair and Relief Candy Cane Install",client:"USDA",status:"#BIDDING",pct:0},
@@ -409,8 +587,8 @@
     {id:3055340,name:"Modera Parking Structure Gas Detection System Inspection",client:"Modera West Wash Park",status:"#OUT_FOR_SIGNATURE",pct:0,recent:true},
     {id:3055805,name:"Pico Cyl Analyzer Display Repair",client:"Rocky Mountain Air",status:"#OUT_FOR_SIGNATURE",pct:0,recent:true},
     {id:3060939,name:"NIST BMF/PIF Outdoor Liquid Nitrogen System Upgrade",client:"National Institute of Standards and Technology (NIST)",status:"#BIDDING",pct:0,recent:true},
-    {id:3063594,name:"Element New VJ Pipe Drop",client:"Element",status:"#OUT_FOR_SIGNATURE",pct:0,recent:true},
-    {id:3083929,name:"KP Seafood Getter Column Installation Trip",client:"King and Prince Seafood",status:"#ACTIVE",pct:0}
+    {id:3063594,name:"Element New VJ Pipe Drop",client:"Element",status:"#OUT_FOR_SIGNATURE",pct:0,recent:true,
+      summary:"Materials procurement for the gas/cryogenic system is scheduled for today."}
   ];
 
   function stageOf(p) { return STAGE[p.status] || 'pipeline'; }
@@ -486,8 +664,13 @@
       '<div class="chart-card"><h3>Jobs by status</h3><p class="chart-note">All '+projects.length+' open contract jobs, by their current Knowify status.</p>' + renderBarChart(statusRows) + '</div>' +
       '<div class="chart-card"><h3>Workload by project manager</h3><p class="chart-note">Most jobs don\'t have a PM assigned in Knowify yet — that gap is real, not a rendering issue.</p>' + renderBarChart(pmRows) + '</div>' +
       '<div class="chart-card wide"><h3>% complete among active jobs</h3><p class="chart-note">Of '+activeJobs.length+' jobs marked Active, this is how far along they are.</p>' + renderBarChart(pctRows) + '</div>';
+    var note = document.getElementById('insights-note');
+    if (note) note.textContent = 'A breakdown of the same ' + projects.length + ' open contract jobs, computed live from the data above.';
   }
   renderInsights();
+  renderWeekSkeleton();
+  loadWeather();
+  renderActivity();
 
   // ---- Calendar (rolling 30 days from today, not the fixed calendar month) ----
   function fmtMonthDay(d){ return d.toLocaleDateString('en-US', {month:'short', day:'numeric'}); }
@@ -598,15 +781,18 @@
 
   // ---- Tabs ----
   function selectTab(which){
+    document.getElementById('tab-week').setAttribute('aria-selected', which==='week');
     document.getElementById('tab-pulse').setAttribute('aria-selected', which==='pulse');
     document.getElementById('tab-all').setAttribute('aria-selected', which==='all');
     document.getElementById('tab-insights').setAttribute('aria-selected', which==='insights');
     document.getElementById('tab-calendar').setAttribute('aria-selected', which==='calendar');
+    document.getElementById('panel-week').classList.toggle('active', which==='week');
     document.getElementById('panel-pulse').classList.toggle('active', which==='pulse');
     document.getElementById('panel-all').classList.toggle('active', which==='all');
     document.getElementById('panel-insights').classList.toggle('active', which==='insights');
     document.getElementById('panel-calendar').classList.toggle('active', which==='calendar');
   }
+  document.getElementById('tab-week').addEventListener('click', function(){ selectTab('week'); });
   document.getElementById('tab-pulse').addEventListener('click', function(){ selectTab('pulse'); });
   document.getElementById('tab-all').addEventListener('click', function(){ selectTab('all'); });
   document.getElementById('tab-insights').addEventListener('click', function(){ selectTab('insights'); });
