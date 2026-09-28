@@ -96,12 +96,28 @@
   .asof strong { color: var(--text-secondary); font-weight: 600; }
 
   .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 18px 0 20px; }
-  .kpi { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 13px 15px; display: flex; flex-direction: column; gap: 4px; }
+  .kpi { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 13px 15px; display: flex; flex-direction: column; gap: 4px; cursor: pointer; transition: box-shadow .15s ease; text-align: left; font: inherit; }
+  .kpi:hover { box-shadow: var(--shadow); }
+  .kpi:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .kpi .label { font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
   .kpi .value { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; }
   .kpi .value.warn { color: var(--warning); }
   .kpi .sub { font-size: 11.5px; color: var(--text-muted); }
   @media (max-width: 640px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+
+  .search-btn { appearance: none; border: 1px solid var(--border); background: var(--surface-1); color: var(--text-secondary); width: 34px; height: 34px; border-radius: 50%; font-size: 14px; cursor: pointer; flex: 0 0 auto; }
+  .search-btn:hover { background: var(--surface-3); }
+  .search-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .header-actions { display: flex; align-items: center; gap: 10px; }
+
+  .list-item { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; margin-bottom: 8px; cursor: pointer; transition: box-shadow .15s ease; }
+  .list-item:hover { box-shadow: var(--shadow); }
+  .list-item .li-row1 { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+  .list-item .li-name { font-size: 13.5px; font-weight: 700; }
+  .list-item .li-client { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+  .list-item .li-summary { font-size: 12.5px; color: var(--text-secondary); margin-top: 6px; line-height: 1.45; }
+  .list-item .li-summary.flagged { color: var(--warning); font-weight: 600; }
+  .list-empty { font-size: 13px; color: var(--text-muted); font-style: italic; padding: 6px 0; }
 
   .tabs { display: flex; gap: 4px; margin-bottom: 14px; border-bottom: 1px solid var(--gridline); flex-wrap: wrap; }
   .tab { appearance: none; border: none; background: none; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--text-muted); padding: 8px 4px 10px; border-bottom: 2px solid transparent; margin-right: 16px; }
@@ -258,7 +274,10 @@
         <h1>Knowify Pulse</h1>
         <div class="company">Safe Gas Systems — job status, pulled live from Knowify</div>
       </div>
-      <div class="asof" id="asof"></div>
+      <div class="header-actions">
+        <button class="search-btn" id="search-btn" aria-label="Search projects" title="Search projects">🔍</button>
+        <div class="asof" id="asof"></div>
+      </div>
     </header>
 
     <div class="kpis" id="kpis"></div>
@@ -334,8 +353,8 @@
 
 <script>
 (function () {
-  var asOf = new Date('2026-09-27T00:00:00Z');
-  document.getElementById('asof').innerHTML = 'Data as of<br><strong>Sep 27, 2026</strong>';
+  var asOf = new Date('2026-09-28T00:00:00Z');
+  document.getElementById('asof').innerHTML = 'Data as of<br><strong>Sep 28, 2026</strong>';
 
   // ---------------------------------------------------------------------
   // Real project data pulled from Knowify (JobsReport + Projects), scoped
@@ -537,7 +556,7 @@
       recent:true, phasesRollup:"A second, larger dewar-repair batch — logged in Knowify but not yet started as of this snapshot.",
       summary:"A follow-on batch of dewar repairs has been logged; no work against it yet as of the last check."},
     {id:2735193,name:"MRI Global Vacuum Insulated Pipe (RFQ# RO-031226-Rev 0)",client:"MRI Global",status:"#ACTIVE",pct:0,recent:true},
-    {id:2736381,name:"Sundyne HP N2 Cyls Upgrades and Maintenance",client:"Sundyne",status:"#PROPOSAL_EXPIRED",pct:0},
+    {id:2736381,name:"Sundyne HP N2 Cyls Upgrades and Maintenance",client:"Sundyne",status:"#OUT_FOR_SIGNATURE",pct:0},
     {id:2771307,name:"USDA Phase 2 VJ Pipe Row 3",client:"USDA",status:"#PROPOSAL_EXPIRED",pct:0},
     {id:2777131,name:"Cesium Astro Gas Detection Change Order 1 (PO 019430)",client:"Cesium Astro",status:"#ACTIVE",pct:5.02,recent:true},
     {id:2779367,name:"KP Seafood PO R1044389",client:"King and Prince Seafood",status:"#ACTIVE",pct:0},
@@ -568,7 +587,7 @@
       recent:true, summary:"Two routine check-in visits post-repair. System is stable and MHU refill timing is being monitored ahead of insulation work.",
       flag:"A safety valve on the reserve line (post-regulator) was bleeding off (Sep 6) and needs an economizer adjustment."},
     {id:2919615,name:"CSU 6000 Gallon Tank Swap",client:"Rocky Mountain Air",status:"#ACTIVE",pct:null},
-    {id:2947864,name:"Design Phase — Red Bird Farms 30% CO2 Balance N2 Blending System",client:"Red Bird Farms",status:"#OUT_FOR_SIGNATURE",pct:0},
+    {id:2947864,name:"Design Phase — Red Bird Farms 30% CO2 Balance N2 Blending System",client:"Red Bird Farms",status:"#PROPOSAL_EXPIRED",pct:0},
     {id:2955239,name:"KP Seafood Sample Line Getter Columns",client:"King and Prince Seafood",status:"#ACTIVE",pct:null},
     {id:2958715,name:"Sundyne CO2 Regulator Replacement",client:"Sundyne",status:"#ACTIVE",pct:5.93,
       recent:true, summary:"Changed out the second regulator on the CO2 line, set at 300 psi. Full PM inspection run across the nitrogen, CO2 and helium systems — about 10 small leaks found and corrected, water level on the heater checked with no loss."},
@@ -604,15 +623,22 @@
   var pipeline = projects.filter(function(p){ return stageOf(p) === 'pipeline'; });
   var touched = projects.filter(function(p){ return p.recent; });
   var flagged = projects.filter(function(p){ return p.flag; });
+  var awaitingSignature = projects.filter(function(p){ return p.status==='#BIDDING'||p.status==='#OUT_FOR_SIGNATURE'; });
   var kpis = [
-    {label:'Jobs In Execution', value: execution.length, sub: pipeline.length + ' more in pipeline / bidding'},
-    {label:'Touched Last 14 Days', value: touched.length, sub: 'of ' + projects.length + ' open contract jobs'},
-    {label:'Flagged For A Decision', value: flagged.length, cls: flagged.length ? 'warn' : '', sub: flagged.length ? 'see Short-Term Pulse' : 'nothing outstanding'},
-    {label:'Awaiting Client / Signature', value: projects.filter(function(p){return p.status==='#BIDDING'||p.status==='#OUT_FOR_SIGNATURE';}).length, sub: projects.filter(function(p){return p.status==='#PROPOSAL_EXPIRED';}).length + ' proposals expired'}
+    {kind:'execution', label:'Jobs In Execution', value: execution.length, sub: pipeline.length + ' more in pipeline / bidding', list: execution},
+    {kind:'touched', label:'Touched Last 14 Days', value: touched.length, sub: 'of ' + projects.length + ' open contract jobs', list: touched},
+    {kind:'flagged', label:'Flagged For A Decision', value: flagged.length, cls: flagged.length ? 'warn' : '', sub: flagged.length ? 'see Short-Term Pulse' : 'nothing outstanding', list: flagged},
+    {kind:'awaiting', label:'Awaiting Client / Signature', value: awaitingSignature.length, sub: projects.filter(function(p){return p.status==='#PROPOSAL_EXPIRED';}).length + ' proposals expired', list: awaitingSignature}
   ];
   document.getElementById('kpis').innerHTML = kpis.map(function(k){
-    return '<div class="kpi"><span class="label">'+k.label+'</span><span class="value '+(k.cls||'')+'">'+k.value+'</span><span class="sub">'+k.sub+'</span></div>';
+    return '<button type="button" class="kpi" data-kind="'+k.kind+'"><span class="label">'+k.label+'</span><span class="value '+(k.cls||'')+'">'+k.value+'</span><span class="sub">'+k.sub+'</span></button>';
   }).join('');
+  document.querySelectorAll('.kpi').forEach(function(el){
+    el.addEventListener('click', function(){
+      var k = kpis.filter(function(x){ return x.kind === el.dataset.kind; })[0];
+      if (k) openListView(k.label, k.list.length + ' of ' + projects.length + ' open contract jobs', k.list);
+    });
+  });
 
   // ---- Insights (computed from the same projects array) ----
   function renderBarChart(rows) {
@@ -843,6 +869,52 @@
   function closeDrawer(){ overlay.classList.remove('open'); drawer.classList.remove('open'); }
   overlay.addEventListener('click', closeDrawer);
   document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+
+  // ---- List view (KPI tile drill-downs + global project search) — reuses the drawer ----
+  function renderListItem(p){
+    var h = healthPill(p);
+    var summaryText = p.flag ? p.flag : p.summary;
+    var summaryHtml = summaryText ? '<div class="li-summary'+(p.flag?' flagged':'')+'">'+(p.flag?'⚑ ':'')+summaryText+'</div>'
+      : (p.recent ? '<div class="li-summary" style="color:var(--text-muted);font-style:italic;">Touched recently, no written notes logged.</div>' : '');
+    var pctText = (p.pct!==null&&p.pct!==undefined) ? Math.round(p.pct)+'% complete' : '';
+    return '<div class="list-item" data-id="'+p.id+'">' +
+      '<div class="li-row1"><span class="li-name">'+p.name+'</span><span class="pill '+h.cls+'">'+h.label+'</span></div>' +
+      '<div class="li-client">'+p.client+(pctText?' · '+pctText:'')+'</div>' +
+      summaryHtml +
+      '</div>';
+  }
+  function openListView(title, subtitle, items, opts){
+    opts = opts || {};
+    document.getElementById('drawer-content').innerHTML =
+      '<h2>'+title+'</h2>' +
+      '<div class="client">'+subtitle+'</div>' +
+      '<div class="search" style="margin:16px 0 4px;"><input type="search" id="list-filter-input" placeholder="'+(opts.placeholder||'Filter by project or client…')+'" /></div>' +
+      '<div id="list-results" style="margin-top:12px;"></div>';
+    function renderResults(list){
+      var results = document.getElementById('list-results');
+      if (!results) return;
+      results.innerHTML = list.length ? list.map(renderListItem).join('') : '<div class="list-empty">No matching projects.</div>';
+      results.querySelectorAll('.list-item').forEach(function(el){
+        el.addEventListener('click', function(){ openDrawer(parseInt(el.dataset.id,10)); });
+      });
+    }
+    renderResults(items);
+    var input = document.getElementById('list-filter-input');
+    input.addEventListener('input', function(){
+      var q = this.value.trim().toLowerCase();
+      renderResults(!q ? items : items.filter(function(p){
+        return p.name.toLowerCase().indexOf(q)>-1 || p.client.toLowerCase().indexOf(q)>-1;
+      }));
+    });
+    overlay.classList.add('open');
+    drawer.classList.add('open');
+    input.focus();
+  }
+  function openSearchView(){
+    var alphabetical = projects.slice().sort(function(a,b){ return a.name.localeCompare(b.name); });
+    openListView('Search projects', 'Search any of the ' + projects.length + ' open contract jobs by name or client.', alphabetical, {placeholder:'Search by project or client…'});
+  }
+  document.getElementById('search-btn').addEventListener('click', openSearchView);
 
   function attachRowHandlers(){
     document.querySelectorAll('.rowbtn').forEach(function(row){
