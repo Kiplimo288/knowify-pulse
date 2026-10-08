@@ -1,3 +1,4 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Knowify Pulse</title>
 <style>
   :root, .viz-root {
@@ -353,8 +354,8 @@
 
 <script>
 (function () {
-  var asOf = new Date('2026-10-02T00:00:00Z');
-  document.getElementById('asof').innerHTML = 'Data as of<br><strong>Oct 2, 2026</strong>';
+  var asOf = new Date('2026-10-08T00:00:00Z');
+  document.getElementById('asof').innerHTML = 'Data as of<br><strong>Oct 8, 2026</strong>';
 
   // ---------------------------------------------------------------------
   // Real project data pulled from Knowify (JobsReport + Projects), scoped
@@ -389,14 +390,15 @@
     {id:'aerocare', label:'AeroCare', loc:'Longmont, CO', lat:40.1618574, lon:-105.0810243, projectIds:[2427519]},
     {id:'cesium', label:'Cesium Astro', loc:'Westminster, CO', lat:39.898044, lon:-105.113084, projectIds:[2457852,2680740,2805254,2777131,2894780,3028618]},
     {id:'nrel', label:'NREL FTLB', loc:'Golden, CO', lat:39.7409008, lon:-105.1751885, projectIds:[]},
+    {id:'deeproots', label:'Deep Roots', loc:'Mesquite, NV', lat:36.80554, lon:-114.121962, projectIds:[]},
     {id:'dia', label:'Denver International Airport CUP', loc:'Denver, CO', lat:39.847586, lon:-104.673808, projectIds:[]},
     {id:'moxtek', label:'Moxtek', loc:'Orem, UT', lat:40.3203995, lon:-111.7069047, projectIds:[2267881]}
   ];
 
   var recentActivity = [
-    {date:'2026-09-29', projectId:2805254, project:'Cesium Astro Change Order 5', client:'Cesium Astro', text:'Installed several pieces of pipe, an outdoor Gentex strobe, and put up hangers for the insulated header.'},
-    {date:'2026-09-29', projectId:2904068, project:'UNC 500 Nitrogen Repairs After Inspection', client:'University of Northern Colorado', text:'Repair Cryogenic System — completed.'},
-    {date:'2026-09-25', projectId:0, project:'RMA V8 Testing', client:'Rocky Mountain Air', text:'Testing argon/CO2/O2 V8 units — argon testing completed; CO2 and O2 still pending, no product available to test with. Left-bank pressure transducer and all 6 check valves flagged bad on argon unit.'}
+    {date:'2026-10-06', projectId:3119519, project:'RMA DEN - 2ea 1/4" CO2 Valve Replacement', client:'Rocky Mountain Air', text:'Replaced two 1/4" CO2 valves on the fill system.'},
+    {date:'2026-10-05', projectId:3110719, project:'KS/NE Hospital inspection trip', client:'Rocky Mountain Air', text:'Traveled to and inspected the system at Goodland Regional Hospital.'},
+    {date:'2026-10-05', projectId:3110719, project:'KS/NE Hospital inspection trip', client:'Rocky Mountain Air', text:'Traveled to and inspected the system at Kit Carson County Hospital.'}
   ];
 
   function fmtWeekday(d){ return d.toLocaleDateString('en-US',{weekday:'short'}); }
@@ -506,27 +508,27 @@
       recent:true, phasesRollup:"32 dewars in the repair batch — 24 in progress, 6 not yet started, 1 subcontracted step closed.",
       summary:"Working through a large batch of cryogenic dewars needing repair, unit by unit. Most units are actively in progress; a handful haven't been started yet.", flag:null},
     {id:1850615,name:"Shop test manifold",client:"Shop",status:"#LEAD",pct:null},
-    {id:1850619,name:"UPS Tractor",client:"UPS Tractor Maintenance Shop",status:"#ACTIVE",pct:null,pm:"Jef Frick"},
-    {id:1939643,name:"Hoffman AI Breeders Oxygen Monitoring System 2.0 (Macurco)",client:"Rocky Mountain Air",status:"#ACTIVE",pct:null,pm:"Jef Frick"},
-    {id:1972178,name:"UC Berkeley LN2 Pipe, Controls and Detection System",client:"UC Berkeley CA",status:"#PROPOSAL_EXPIRED",pct:null,pm:"Jef Frick"},
-    {id:2066719,name:"RMA Sterling USP Oxy Truck Fill, Dewar Fill and Analytical",client:"Rocky Mountain Air",status:"#ACTIVE",pct:394.77,pm:"Wes Frick"},
+    {id:1850619,name:"UPS Tractor",client:"UPS Tractor Maintenance Shop",status:"#ACTIVE",pct:null,pm:"Joseph E. (Jef) Frick"},
+    {id:1939643,name:"Hoffman AI Breeders Oxygen Monitoring System 2.0 (Macurco)",client:"Rocky Mountain Air",status:"#ACTIVE",pct:null,pm:"Joseph E. (Jef) Frick"},
+    {id:1972178,name:"UC Berkeley LN2 Pipe, Controls and Detection System",client:"UC Berkeley CA",status:"#PROPOSAL_EXPIRED",pct:null,pm:"Joseph E. (Jef) Frick"},
+    {id:2066719,name:"RMA Sterling USP Oxy Truck Fill, Dewar Fill and Analytical",client:"Rocky Mountain Air",status:"#ACTIVE",pct:394.77,pm:"Joseph W (Wes) Frick"},
     {id:2129781,name:"ABSL Power Solutions TVAC Chamber Services",client:"ABSL Power Solutions Inc",status:"#PENDING_CHANGES",pct:41.17,
       recent:true, phases:[{n:"Design Phase",s:"pending"},{n:"Permitting",s:"pending"},{n:"Installation",s:"pending",sched:"Sep 21, 2026"},{n:"Commissioning and Certification",s:"pending"}],
       summary:"Awaiting a change-order decision from the client before proceeding. Installation phase is scheduled for Sep 21 once that's resolved.", flag:"Pending change order — blocking the scheduled Sep 21 install"},
-    {id:2177798,name:"Idaho National Lab LN2 Dewar Filling Safety System",client:"Idaho National Laboratory",status:"#PROPOSAL_EXPIRED",pct:0,pm:"Jef Frick"},
-    {id:2198334,name:"Cesium Astro Nitrogen System Revision 3.0",client:"Cesium Astro",status:"#PENDING_CHANGES",pct:3.93,pm:"Jef Frick",
+    {id:2177798,name:"Idaho National Lab LN2 Dewar Filling Safety System",client:"Idaho National Laboratory",status:"#PROPOSAL_EXPIRED",pct:0,pm:"Joseph E. (Jef) Frick"},
+    {id:2198334,name:"Cesium Astro Nitrogen System Revision 3.0",client:"Cesium Astro",status:"#PENDING_CHANGES",pct:3.96,pm:"Joseph E. (Jef) Frick",
       recent:true, phases:[{n:"Initial Inspection and Scope Development",s:"pending"},{n:"Design Phase",s:"pending"},{n:"Permitting",s:"pending"},{n:"Installation",s:"pending",sched:"Aug 21 – Sep 3, 2026"},{n:"Commissioning and Certification",s:"pending"},{n:"Training and Turnover",s:"pending"}],
       summary:"Trailer and a tank delivered to site per the client's request (Sep 14). Crew is now working the pipeline near the break room and coordinating with a caulking contractor, likely for a wall or roof penetration.", flag:null},
     {id:2211615,name:"RMA Colorado Springs Oxy Truck Fill, Dewar Fill and Analytical",client:"Rocky Mountain Air",status:"#ACTIVE",pct:null},
     {id:2214190,name:"RMA Laramie USP Truck, Dewar Fill, and Analytics",client:"Rocky Mountain Air",status:"#ACTIVE",pct:null},
     {id:2267881,name:"Moxtek Nitrogen System Upgrade",client:"Rocky Mountain Air",status:"#ACTIVE",pct:60.94},
-    {id:2300640,name:"Northern Colorado Medical Center Oxygen System Upgrade",client:"Rocky Mountain Air",status:"#ACTIVE",pct:50.57,pm:"Wes Frick",
+    {id:2300640,name:"Northern Colorado Medical Center Oxygen System Upgrade",client:"Rocky Mountain Air",status:"#ACTIVE",pct:50.57,pm:"Joseph W (Wes) Frick",
       recent:true, phases:[{n:"Design Phase",s:"pending"},{n:"Procure Materials",s:"pending"},{n:"Mobilization",s:"pending",sched:"Aug 27, 2026"},{n:"Install Temporary Supply MHU Trailer",s:"pending",sched:"Aug 28, 2026"},{n:"Installation",s:"pending",sched:"Sep 8, 2026"},{n:"Training and Turnover",s:"pending",sched:"Sep 9, 2026"},{n:"Demobilize",s:"pending"},{n:"Shelter",s:"pending"}],
       summary:"Piping from the final line manifold to supply stubs is in and commissioned. The facility is running on the trailer supply while permanent piping gets insulated — insulators arrived Sep 9 and piping was labeled and secured by Sep 15. Handover packet was ~80% done as of Sep 4, with handover to the client targeted for the following week.",
       flag:"Ice was spotted protruding through the insulation at the primary valve/safety (Sep 15 note) — unresolved as of the last entry."},
     {id:2421936,name:"Technical Support and Consultation",client:"Rocky Mountain Air",status:"#ACTIVE",pct:null},
     {id:2427519,name:"AeroCare - CCX-R20",client:"Rocky Mountain Air",status:"#ACTIVE",pct:null},
-    {id:2457852,name:"Cesium Astro Gas Detection",client:"Cesium Astro",status:"#ACTIVE",pct:4.19,pm:"Jef Frick",
+    {id:2457852,name:"Cesium Astro Gas Detection",client:"Cesium Astro",status:"#ACTIVE",pct:4.19,pm:"Joseph E. (Jef) Frick",
       phases:[{n:"Design Phase",s:"pending",sched:"Oct 19 – Nov 8, 2025"},{n:"Permitting",s:"pending",sched:"Nov 10 – 30, 2025"},{n:"Procure Materials",s:"pending",sched:"Oct 20 – Nov 19, 2025"},{n:"Installation",s:"pending",sched:"Nov 30 – Dec 13, 2025"},{n:"Calibrate/Test/Certify Gas Detection System",s:"pending",sched:"Dec 14 – 15, 2025"},{n:"Training and Turnover",s:"pending",sched:"Dec 16 – 17, 2025"}]},
     {id:2489873,name:"KP Seafood Spares R1052324",client:"King and Prince Seafood",status:"#ACTIVE",pct:null},
     {id:2494369,name:"KP Seafood Filters for R1052738",client:"King and Prince Seafood",status:"#ACTIVE",pct:0},
@@ -534,9 +536,9 @@
     {id:2540251,name:"Oxygen Flow Panel Clean for Oxygen Service",client:"Industrial Control LLC",status:"#ACTIVE",pct:38.59},
     {id:2545633,name:"Rocky Mountain Respiratory Truck - 7849040",client:"Rocky Mountain Respiratory",status:"#LEAD",pct:null},
     {id:2546255,name:"AeroCare Truck - APL-E42",client:"Aero Care",status:"#ACTIVE",pct:null},
-    {id:2547220,name:"Centaurus Farms Gas Detection/Life Safety System",client:"W Principles LLC",status:"#PENDING_CHANGES",pct:10.57,pm:"Wes Frick"},
+    {id:2547220,name:"Centaurus Farms Gas Detection/Life Safety System",client:"W Principles LLC",status:"#PENDING_CHANGES",pct:10.57,pm:"Joseph W (Wes) Frick"},
     {id:2586950,name:"Dragon Products Final Line Replacement",client:"Rocky Mountain Air",status:"#PROPOSAL_EXPIRED",pct:0},
-    {id:2617390,name:"AmeriGas Automated C3H8 Fill Line Detection and Safety",client:"Amerigas",status:"#PROPOSAL_EXPIRED",pct:0,pm:"Jef Frick"},
+    {id:2617390,name:"AmeriGas Automated C3H8 Fill Line Detection and Safety",client:"Amerigas",status:"#PROPOSAL_EXPIRED",pct:0,pm:"Joseph E. (Jef) Frick"},
     {id:2640029,name:"All Points North Oxygen Relocation Revision 3.0",client:"Rocky Mountain Air",status:"#ACTIVE",pct:0.17,
       recent:true, phases:[{n:"Design Phase",s:"pending"},{n:"Procure Materials",s:"pending",sched:"Aug 19, 2026"},{n:"Relocate Existing Medical Oxygen System (+ vaporizer, vape cycler, final line, expanded reserve)",s:"pending"},{n:"Commissioning and Certification",s:"pending"},{n:"Training and Turnover",s:"pending"},{n:"Install 400' 1.5\" Supply Pipe to New Tie-In Point",s:"pending"},{n:"Third-Party Medical Gas Purity Certification",s:"pending"},{n:"Documentation",s:"pending"}],
       summary:"Early days on this relocation — materials procurement underway, no installation activity logged yet."},
@@ -547,7 +549,7 @@
       recent:true, phases:[{n:"Procure Materials",s:"pending"},{n:"Install Vacuum Insulated Pipe System for LN2",s:"pending",sched:"Sep 14 – 18, 2026"}],
       summary:"Materials procurement in progress; the LN2 vacuum-insulated pipe install is scheduled for Sep 14–18."},
     {id:2693994,name:"Red Bird Farms SGS Safe Touch Pro Blend Master Edition Control System",client:"Red Bird Farms",status:"#PROPOSAL_EXPIRED",pct:0},
-    {id:2702752,name:"Copy of RMA Dewars Repair",client:"Rocky Mountain Air",status:"#ACTIVE",pct:128.22,
+    {id:2702752,name:"Copy of RMA Dewars Repair",client:"Rocky Mountain Air",status:"#ACTIVE",pct:147.43,
       recent:true, phasesRollup:"A second, larger dewar-repair batch — logged in Knowify but not yet started as of this snapshot.",
       summary:"A follow-on batch of dewar repairs has been logged; no work against it yet as of the last check."},
     {id:2735193,name:"MRI Global Vacuum Insulated Pipe (RFQ# RO-031226-Rev 0)",client:"MRI Global",status:"#ACTIVE",pct:0,recent:true},
@@ -563,10 +565,10 @@
       recent:true, summary:"Pipe installed, an outdoor Gentex strobe mounted, and hangers put up for the insulated header (Sep 29)."},
     {id:2829669,name:"Copy of Cesium Astro 9000 Gallon Installation",client:"Rocky Mountain Air",status:"#BIDDING",pct:0.65},
     {id:2846237,name:"Marston Water Plant Repairs After Inspection",client:"Rocky Mountain Air",status:"#PROPOSAL_EXPIRED",pct:0},
-    {id:2851176,name:"Cylinder Covers for Size 300/Tin Cleanroom Area",client:"Johnson and Johnson",status:"#ACTIVE",pct:0},
+    {id:2851176,name:"Cylinder Covers for Size 300/Tin Cleanroom Area",client:"Shockwave Medical Inc",status:"#ACTIVE",pct:0},
     {id:2852899,name:"KP Seafood PO#R1054790",client:"King and Prince Seafood",status:"#ACTIVE",pct:0},
     {id:2852998,name:"KP Seafood PO#R1054817",client:"King and Prince Seafood",status:"#ACTIVE",pct:110.34},
-    {id:2859014,name:"Cesium Astro 5500 Liter Install",client:"Rocky Mountain Air",status:"#PROPOSAL_EXPIRED",pct:68.32,
+    {id:2859014,name:"Cesium Astro 5500 Liter Install",client:"Rocky Mountain Air",status:"#PROPOSAL_EXPIRED",pct:80.55,
       recent:true, summary:"Logistics/prep phase — trailer hardware sourced, then the 5500L tank and vaporizer loaded for delivery to Cesium Astro. Nothing flagged as of the last entry."},
     {id:2870553,name:"LNG ISO Vessel Inspection - Olson Greenhouse",client:"Olson Greenhouse",status:"#ACTIVE",pct:0},
     {id:2870664,name:"Portable CO2 and Oxygen Detectors for Drivers",client:"Rocky Mountain Air",status:"#ACTIVE",pct:null,recent:true},
@@ -576,7 +578,7 @@
     {id:2894780,name:"Cesium Astro Gas Detection CO 4 - Horn Strobes/Signage",client:"Cesium Astro",status:"#ACTIVE",pct:null,recent:true},
     {id:2900981,name:"Steves Gas Bag",client:"Steve",status:"#ACTIVE",pct:0},
     {id:2901738,name:"HCI Work Flow Template",client:"Safe Gas Systems",status:"#LEAD",pct:0,pm:"Steve Cather"},
-    {id:2902775,name:"MoxTek Forced Air Vaporizer Upgrade",client:"Rocky Mountain Air",status:"#BIDDING",pct:0},
+    {id:2902775,name:"MoxTek Forced Air Vaporizer Upgrade",client:"Rocky Mountain Air",status:"#BIDDING",pct:0.12},
     {id:2904013,name:"UPS Tractor Shop Gas Detection and Control System Repairs",client:"UPS Tractor Maintenance Shop",status:"#PROPOSAL_EXPIRED",pct:0},
     {id:2904034,name:"Greeley Water CNG Leak",client:"City Of Greeley",status:"#ACTIVE",pct:16.80,recent:true},
     {id:2904068,name:"UNC 500 Nitrogen Repairs After Inspection",client:"University of Northern Colorado",status:"#ACTIVE",pct:12.02,
@@ -596,18 +598,18 @@
     {id:3028618,name:"Cesium Astro LN2 Drop 6'",client:"Cesium Astro",status:"#ACTIVE",pct:0},
     {id:3030705,name:"Olson Greenhouse LNG ISO Relief Replacements",client:"Olson Greenhouse",status:"#ACTIVE",pct:0},
     {id:3038039,name:"Phillips Plumbing Oxygen Clean Parts",client:"Phillips Plumbing",status:"#PROPOSAL_EXPIRED",pct:null},
-    {id:3055340,name:"Modera Parking Structure Gas Detection System Inspection",client:"Modera West Wash Park",status:"#OUT_FOR_SIGNATURE",pct:0,recent:true},
-    {id:3055805,name:"Pico Cyl Analyzer Display Repair",client:"Rocky Mountain Air",status:"#OUT_FOR_SIGNATURE",pct:0,recent:true},
+    {id:3055340,name:"Modera Parking Structure Gas Detection System Inspection",client:"Modera West Wash Park",status:"#PROPOSAL_EXPIRED",pct:0,recent:true},
+    {id:3055805,name:"Pico Cyl Analyzer Display Repair",client:"Rocky Mountain Air",status:"#PROPOSAL_EXPIRED",pct:0,recent:true},
     {id:3060939,name:"NIST BMF/PIF Outdoor Liquid Nitrogen System Upgrade",client:"National Institute of Standards and Technology (NIST)",status:"#BIDDING",pct:0,recent:true},
     {id:3063594,name:"Element New VJ Pipe Drop",client:"Element",status:"#OUT_FOR_SIGNATURE",pct:72.78,recent:true,
       summary:"Materials procurement for the gas/cryogenic system is well underway."},
     {id:3105134,name:"Transport 2ea 5500 Perma to SLC and a 3,000 Vertical Bulk from SLC to Denver",client:"Rocky Mountain Air",status:"#ACTIVE",pct:0},
     {id:3110017,name:"Daniel Defense Argon Distribution and O2 Deficiency Monitoring",client:"Roberts Oxygen Company",status:"#OUT_FOR_SIGNATURE",pct:0},
-    {id:3112919,name:"D-Cubed Space LN2 Project Design and Permitting",client:"Rocky Mountain Air",status:"#BIDDING",pct:null},
-    {id:3112988,name:"D-Cubed Space Vacuum Insulated LN2 Dewar Switchover Manifold",client:"Rocky Mountain Air",status:"#LEAD",pct:0},
-    {id:3112993,name:"D-Cubed Space Vacuum Insulated (Reconditioned) LN2 Safety Shutdown Valve and VI Hose",client:"Rocky Mountain Air",status:"#BIDDING",pct:0},
-    {id:3112995,name:"D-Cubed Space Un-Insulated Nitrogen Manifold with Support Structure",client:"Rocky Mountain Air",status:"#BIDDING",pct:0},
-    {id:3113000,name:"D-Cubed Space Oxygen Deficiency Monitoring",client:"Rocky Mountain Air",status:"#BIDDING",pct:0}
+    {id:3112919,name:"D-Cubed Space LN2 Project Design and Permitting",client:"Rocky Mountain Air",status:"#OUT_FOR_SIGNATURE",pct:null},
+    {id:3112993,name:"D-Cubed Space Vacuum Insulated (Reconditioned) LN2 Safety Shutdown Valve and VI Hose",client:"Rocky Mountain Air",status:"#OUT_FOR_SIGNATURE",pct:0},
+    {id:3113000,name:"D-Cubed Space Oxygen Deficiency Monitoring",client:"Rocky Mountain Air",status:"#OUT_FOR_SIGNATURE",pct:0},
+    {id:3115109,name:"Pall Filtration Hydrogen Chloride and Hydrogen Bromide Gas Cabinets w/ Manifolds, Controls, Gas Detection and Abatement",client:"Pall Filtration",status:"#OUT_FOR_SIGNATURE",pct:0,pm:"Joseph E. (Jef) Frick"},
+    {id:3123955,name:"Sheridan Wyoming VA Hospital",client:"Rocky Mountain Air",status:"#LEAD",pct:null}
   ];
 
   function stageOf(p) { return STAGE[p.status] || 'pipeline'; }
@@ -928,3 +930,5 @@
   });
 })();
 </script>
+
+</body></html>
