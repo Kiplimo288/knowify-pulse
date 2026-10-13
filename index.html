@@ -354,8 +354,8 @@
 
 <script>
 (function () {
-  var asOf = new Date('2026-10-11T00:00:00Z');
-  document.getElementById('asof').innerHTML = 'Data as of<br><strong>Oct 11, 2026</strong>';
+  var asOf = new Date('2026-10-13T00:00:00Z');
+  document.getElementById('asof').innerHTML = 'Data as of<br><strong>Oct 13, 2026</strong>';
 
   // ---------------------------------------------------------------------
   // Real project data pulled from Knowify (JobsReport + Projects), scoped
@@ -369,7 +369,8 @@
   // Most jobs have no scheduled dates on file yet — this list is intentionally short.
   var calendarEvents = [
     {projectId:2904068, date:'2026-10-13', label:'Repair cryogenic system'},
-    {projectId:2904034, date:'2026-10-14', label:'Investigation — leak detection, flammable pipeline'}
+    {projectId:2904034, date:'2026-10-14', label:'Investigation — leak detection, flammable pipeline'},
+    {projectId:2198334, date:'2026-10-14', endDate:'2026-10-16', label:'Installation phase begins'}
   ];
 
   // ---------------------------------------------------------------------
@@ -396,15 +397,15 @@
   ];
 
   var recentActivity = [
+    {date:'2026-10-14', projectId:2198334, project:'Cesium Astro Nitrogen System Revision 3.0', client:'Cesium Astro', text:'Scheduled: installation phase begins (through Oct 16).'},
     {date:'2026-10-14', projectId:2904034, project:'Greeley Water CNG Leak', client:'City Of Greeley', text:'Scheduled: investigate a flammable-gas leak on the pipeline.'},
     {date:'2026-10-13', projectId:2904068, project:'UNC 500 Nitrogen Repairs After Inspection', client:'University of Northern Colorado', text:'Scheduled: repair cryogenic system.'},
+    {date:'2026-10-12', projectId:3127298, project:'RMA Tank 114', client:'Rocky Mountain Air', text:'The reported tank 114 issue wasn\'t actually at the Denver fill plant as reported — extra travel time spent tracking it down.'},
     {date:'2026-10-11', projectId:2714823, project:'Denver International Airport CUP Gas Detection System Maintenance and Certification', client:'Denver International Airport', text:'A question came in about whether a follow-up sensor replacement/repair on this system was ever tracked — worth checking.'},
     {date:'2026-10-09', projectId:2902775, project:'MoxTek Vaporizer and Final Line Upgrade Oct 2026', client:'Rocky Mountain Air', text:'Teams meeting with Moxtek to finalize scope and schedule.'},
     {date:'2026-10-08', projectId:1939643, project:'Hoffman AI Breeders Oxygen Monitoring System 2.0 (Macurco)', client:'Rocky Mountain Air', text:'Finished the gas detection work — waited on overnighted horn strobes, then calibrated sensors and function-tested the horn, strobe and fan set points.'},
     {date:'2026-10-07', projectId:1939643, project:'Hoffman AI Breeders Oxygen Monitoring System 2.0 (Macurco)', client:'Rocky Mountain Air', text:'Drove up to Logan for the gas detection service work; moved a sensor and horn strobe and hooked up the fan relays into the controller.'},
-    {date:'2026-10-06', projectId:3119519, project:'RMA DEN - 2ea 1/4" CO2 Valve Replacement', client:'Rocky Mountain Air', text:'Replaced two 1/4" CO2 valves on the fill system.'},
-    {date:'2026-10-05', projectId:3110719, project:'KS/NE Hospital inspection trip', client:'Rocky Mountain Air', text:'Traveled to and inspected the system at Goodland Regional Hospital.'},
-    {date:'2026-10-05', projectId:3110719, project:'KS/NE Hospital inspection trip', client:'Rocky Mountain Air', text:'Traveled to and inspected the system at Kit Carson County Hospital.'}
+    {date:'2026-10-06', projectId:3119519, project:'RMA DEN - 2ea 1/4" CO2 Valve Replacement', client:'Rocky Mountain Air', text:'Replaced two 1/4" CO2 valves on the fill system.'}
   ];
 
   function fmtWeekday(d){ return d.toLocaleDateString('en-US',{weekday:'short'}); }
@@ -515,7 +516,7 @@
       summary:"Working through a large batch of cryogenic dewars needing repair, unit by unit. Most units are actively in progress; a handful haven't been started yet.", flag:null},
     {id:1850615,name:"Shop test manifold",client:"Shop",status:"#LEAD",pct:null},
     {id:1850619,name:"UPS Tractor",client:"UPS Tractor Maintenance Shop",status:"#ACTIVE",pct:null,pm:"Joseph E. (Jef) Frick"},
-    {id:1939643,name:"Hoffman AI Breeders Oxygen Monitoring System 2.0 (Macurco)",client:"Rocky Mountain Air",status:"#PENDING_CHANGES",pct:null,pm:"Joseph E. (Jef) Frick",
+    {id:1939643,name:"Hoffman AI Breeders Oxygen Monitoring System 2.0 (Macurco)",client:"Rocky Mountain Air",status:"#ACTIVE",pct:null,pm:"Joseph E. (Jef) Frick",
       recent:true, summary:"Finished the gas detection work this week — waited on overnighted horn strobes, then calibrated sensors and function-tested the horn, strobe and fan set points.", flag:null},
     {id:1972178,name:"UC Berkeley LN2 Pipe, Controls and Detection System",client:"UC Berkeley CA",status:"#PROPOSAL_EXPIRED",pct:null,pm:"Joseph E. (Jef) Frick"},
     {id:2066719,name:"RMA Sterling USP Oxy Truck Fill, Dewar Fill and Analytical",client:"Rocky Mountain Air",status:"#ACTIVE",pct:394.77,pm:"Joseph W (Wes) Frick"},
@@ -588,7 +589,7 @@
       recent:true, summary:"Teams meeting held with Moxtek to finalize scope and schedule.", flag:null},
     {id:2904013,name:"UPS Tractor Shop Gas Detection and Control System Repairs",client:"UPS Tractor Maintenance Shop",status:"#PROPOSAL_EXPIRED",pct:0},
     {id:2904034,name:"Greeley Water CNG Leak",client:"City Of Greeley",status:"#ACTIVE",pct:16.80,recent:true},
-    {id:2904068,name:"UNC 500 Nitrogen Repairs After Inspection",client:"University of Northern Colorado",status:"#ACTIVE",pct:12.02,
+    {id:2904068,name:"UNC 500 Nitrogen Repairs After Inspection",client:"University of Northern Colorado",status:"#ACTIVE",pct:12.32,
       recent:true, summary:"Two routine check-in visits post-repair. System is stable and MHU refill timing is being monitored ahead of insulation work.",
       flag:"A safety valve on the reserve line (post-regulator) was bleeding off (Sep 6) and needs an economizer adjustment."},
     {id:2919615,name:"CSU 6000 Gallon Tank Swap",client:"Rocky Mountain Air",status:"#ACTIVE",pct:null},
